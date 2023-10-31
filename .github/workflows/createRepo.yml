@@ -29,8 +29,11 @@ jobs:
 #          echo Add other actions to build,
 #          echo test, and deploy your project.
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - run: gh repo create template-test --template alexcwchan/aks_template --private
+      # run gh cli to manage new repo
+      - run: |
+          gh repo create template-test --template alexcwchan/aks_template --private
+          gh secret set AKS_TOKEN --repo template-test --body "$token"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          token: "123"
 
