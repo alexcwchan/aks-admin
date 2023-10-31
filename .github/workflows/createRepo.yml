@@ -31,5 +31,4 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - run: gh repo create template-test --template alexcwchan/aks_template --private
-        env:
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN }}
+
