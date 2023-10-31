@@ -36,7 +36,7 @@ jobs:
 
       # run gh cli to manage new repo
       - run: |
-          gh repo create ${{ github.event.inputs.name }} --template alexcwchan/aks-template --private
+          gh repo create ${{ github.event.inputs.name }} --template alexcwchan/aks_template --private
           gh secret set AKS_TOKEN --repo alexcwchan/${{ github.event.inputs.name }} --body "$token"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
