@@ -37,7 +37,7 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az ad app create --display-name ${{ github.event.inputs.name }}
+            az ad app create --display-name ${{ github.event.inputs.name }} --query []."id" | awk -F '"' '{print $2}'
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
 #      - uses: actions/checkout@v3
