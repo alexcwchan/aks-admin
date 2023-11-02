@@ -37,8 +37,7 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az account show
-            az group list
+            az ad app create --display-name ${{ github.event.inputs.name }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
 #      - uses: actions/checkout@v3
