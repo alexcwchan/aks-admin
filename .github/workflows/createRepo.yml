@@ -32,12 +32,17 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az ad app create --display-name ${{ github.event.inputs.name }} --query []."id" | awk -F '"' '{print $2}'
+      - name: Run az commands
+        shell: pwsh
+        run: |
+          az group list --out table
+
+#      - name: Azure CLI script
+#        uses: azure/CLI@v1
+#        with:
+#          azcliversion: latest
+#          inlineScript: |
+#            az ad app create --display-name ${{ github.event.inputs.name }} --query []."id" | awk -F '"' '{print $2}'
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
 #      - uses: actions/checkout@v3
