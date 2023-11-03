@@ -34,7 +34,10 @@ jobs:
 
       - name: Run az commands
         run: |
-          az ad app create --display-name ${{ github.event.inputs.name }} --query "id" | td -d '"'
+          echo "AZURE_APP_ID=$(az ad app create --display-name ${{ github.event.inputs.name }} --query "id" | tr -d '"')" >> $GITHUB_ENV
+
+      - name: Echo Env variable
+        run: echo $AZURE_APP_ID
 
 #      - name: Azure CLI script
 #        uses: azure/CLI@v1
