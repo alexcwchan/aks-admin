@@ -33,7 +33,6 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Run az commands
-        shell: pwsh
         run: |
           az ad app create --display-name ${{ github.event.inputs.name }} --query "id" | td -d '"'
 
