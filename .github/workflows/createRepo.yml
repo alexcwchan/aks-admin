@@ -51,16 +51,15 @@ jobs:
 
     - name: Register an App
       run: |
-         az ad app create --display-name ${{ env.AZURE_APP_NAME }} --query "id" | tr -d '"'
-#        echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.AZURE_APP_NAME }} --query "id" | tr -d '"')" >> $GITHUB_ENV
+        echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.AZURE_APP_NAME }} --query "id" | tr -d '"')" >> $GITHUB_ENV
 
-#    - name: Create Federated Credential
-#      run: |
-#        az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
+    - name: Create Federated Credential
+      run: |
+        az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
-#    - name: Create Token for Azure Container Registry
-#      run: |
-#        az acr token create --name ${{ env.AZURE_ACR_TOKEN }} --registry acrforhkusttest --repository ${{ env.AZURE_APP_NAME }} content/write content/read
+    - name: Create Token for Azure Container Registry
+      run: |
+        az acr token create --name ${{ env.AZURE_ACR_TOKEN }} --registry acrforhkusttest --repository ${{ env.AZURE_APP_NAME }} content/write content/read
 
 #      - name: Echo Env variable
 #        run: |
