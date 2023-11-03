@@ -8,14 +8,17 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: New Repository Name
+        description: New Application Name
         type: string
         required: true
 
 permissions:
   id-token: write
   contents: read
-  
+
+env:
+  AZURE_APP_NAME: aks-app-${{ github.event.inputs.name }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -34,10 +37,12 @@ jobs:
 
       - name: Run az commands
         run: |
-          echo "AZURE_APP_ID=$(az ad app create --display-name ${{ github.event.inputs.name }} --query "id" | tr -d '"')" >> $GITHUB_ENV
+          echo "AZURE_APP_ID=$(az ad app create --display-name aks-app-${{ github.event.inputs.name }} --query "id" | tr -d '"')" >> $GITHUB_ENV
 
       - name: Echo Env variable
-        run: echo $AZURE_APP_ID
+        run: |
+          echo $AZURE_APP_ID
+          echo $AZURE_APP_NAME
 
 #      - name: Azure CLI script
 #        uses: azure/CLI@v1
