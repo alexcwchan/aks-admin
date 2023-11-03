@@ -17,7 +17,9 @@ permissions:
   contents: read
 
 env:
+  APP_NAME: ${{ github.event.inputs.name }}
   AZURE_APP_NAME: aks-app-${{ github.event.inputs.name }}
+  AZURE_ACR_TOKEN: aks-app-${{ github.event.inputs.name }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -37,12 +39,13 @@ jobs:
 
       - name: Run az commands
         run: |
-          echo "AZURE_APP_ID=$(az ad app create --display-name aks-app-${{ github.event.inputs.name }} --query "id" | tr -d '"')" >> $GITHUB_ENV
+          echo "AZURE_APP_ID=$(az ad app create --display-name $AZURE_APP_NAME --query "id" | tr -d '"')" >> $GITHUB_ENV
+          az ad app federated-credential create --id $AZURE_APP_ID --parameters {"name": "$APP_NAME", "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:alexcwchan/$APP_NAME:branch:main", "description": "OIDC for $APP_NAME", "audiences": ["api://AzureADTokenExchange"]}
 
-      - name: Echo Env variable
-        run: |
-          echo $AZURE_APP_ID
-          echo $AZURE_APP_NAME
+#      - name: Echo Env variable
+#        run: |
+#          echo $AZURE_APP_ID
+#          echo $AZURE_APP_NAME
 
 #      - name: Azure CLI script
 #        uses: azure/CLI@v1
