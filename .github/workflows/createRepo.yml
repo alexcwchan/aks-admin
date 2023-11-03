@@ -30,27 +30,40 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Login via Az module
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Checkout the repository to the GitHub Actions runner
+      uses: actions/checkout@v3
 
-      - name: Register an App
-        run: |
-          echo "AZURE_APP_ID=$(az ad app create --display-name $AZURE_APP_NAME --query "id" | tr -d '"')" >> $GITHUB_ENV
+    - name: Replace token with env variables
+      uses: cschleiden/replace-tokens@v1
+      with:
+        tokenPrefix: '#{'
+        tokenSuffix: '}#'
+        files: '["./federated-credential.json"]'
+      env:
+        APP_NAME: $APP_NAME
 
-      - name: Echo Env variable
-        run: |
-          echo $APP_NAME
-          echo $AZURE_APP_ID
-          echo $AZURE_APP_NAME
-          echo $AZURE_ACR_TOKEN
+    - name: Login via Az module
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Create Federated Credential
-        run: |
-          az ad app federated-credential create --id $AZURE_APP_ID --parameters '{"name": "$APP_NAME", "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:alexcwchan/$APP_NAME:refs:refs/heads:main", "description": "OIDC for $APP_NAME", "audiences": ["api://AzureADTokenExchange"]}'
+    - name: Register an App
+      run: |
+        echo "AZURE_APP_ID=$(az ad app create --display-name $AZURE_APP_NAME --query "id" | tr -d '"')" >> $GITHUB_ENV
+
+    - name: Create Federated Credential
+      run: |
+        az ad app federated-credential create --id $AZURE_APP_ID --parameters federated-credential.json
+
+#      - name: Echo Env variable
+#        run: |
+#          echo $APP_NAME
+#          echo $AZURE_APP_ID
+#          echo $AZURE_APP_NAME
+#          echo $AZURE_ACR_TOKEN
+
 
 #      - name: Azure CLI script
 #        uses: azure/CLI@v1
