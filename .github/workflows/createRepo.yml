@@ -19,7 +19,7 @@ permissions:
 env:
   APP_NAME: ${{ github.event.inputs.name }}
   AZURE_APP_NAME: aks-app-${{ github.event.inputs.name }}
-  AZURE_ACR_TOKEN: aks-app-${{ github.event.inputs.name }}
+  AZURE_ACR_TOKEN: "aks-app-${{ github.event.inputs.name }}"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -46,6 +46,7 @@ jobs:
           echo $APP_NAME
           echo $AZURE_APP_ID
           echo $AZURE_APP_NAME
+          echo $AZURE_ACR_TOKEN
 
       - name: Create Federated Credential
         run: |
