@@ -35,7 +35,7 @@ jobs:
       - name: Run az commands
         shell: pwsh
         run: |
-          az group list --out table
+          az ad app create --display-name ${{ github.event.inputs.name }} --query "id" | td -d '"'
 
 #      - name: Azure CLI script
 #        uses: azure/CLI@v1
