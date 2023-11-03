@@ -49,7 +49,7 @@ jobs:
 
       - name: Create Federated Credential
         run: |
-          az ad app federated-credential create --id $AZURE_APP_ID --parameters "{name: $APP_NAME, issuer: https://token.actions.githubusercontent.com, subject: repo:alexcwchan/$APP_NAME:refs:refs/heads:main, description: OIDC for $APP_NAME, audiences: [api://AzureADTokenExchange]}"
+          az ad app federated-credential create --id $AZURE_APP_ID --parameters '{"name": "$APP_NAME", "issuer": "https://token.actions.githubusercontent.com", "subject": "repo:alexcwchan/$APP_NAME:refs:refs/heads:main", "description": "OIDC for $APP_NAME", "audiences": ["api://AzureADTokenExchange"]}'
 
 #      - name: Azure CLI script
 #        uses: azure/CLI@v1
