@@ -40,7 +40,7 @@ jobs:
         tokenSuffix: '}#'
         files: '["./federated-credential.json"]'
       env:
-        APP_NAME: $APP_NAME
+        APP_NAME: ${{ env.APP_NAME }}
 
     - name: Login via Az module
       uses: azure/login@v1
@@ -51,11 +51,11 @@ jobs:
 
     - name: Register an App
       run: |
-        echo "AZURE_APP_ID=$(az ad app create --display-name $AZURE_APP_NAME --query "id" | tr -d '"')" >> $GITHUB_ENV
+        echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.AZURE_APP_NAME }} --query "id" | tr -d '"')" >> $GITHUB_ENV
 
     - name: Create Federated Credential
       run: |
-        az ad app federated-credential create --id $AZURE_APP_ID --parameters federated-credential.json
+        az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
 #      - name: Echo Env variable
 #        run: |
