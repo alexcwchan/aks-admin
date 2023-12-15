@@ -55,12 +55,12 @@ jobs:
     - name: Check namespace status
       id: ns_check
       run: |
-        echo "status=$(kubectl get ns for-aks-admin -o json | jq .status.phase -r)" >> $GITHUB_OUTPUT
+        echo "status=$(kubectl get namespace | grep -q 'for-aks-admin ')" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
     needs: init
-    if: ${{ needs.init.outputs.ns_check }} != Active
+    if: ${{ needs.init.outputs.ns_check }} 
 
     steps:
     - name: test
