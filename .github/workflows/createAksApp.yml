@@ -64,7 +64,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: init
-    if: ${{ needs.init.outputs.ns_check }} 
+    if: not ${{ needs.init.outputs.ns_check }}
 
     steps:
     - name: test
