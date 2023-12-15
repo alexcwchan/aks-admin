@@ -58,7 +58,7 @@ jobs:
         echo "status=$(kubectl get ns for-aks-admin -o json | jq .status.phase -r)" >> $GITHUB_OUTPUT
 
   build:
-    runs-on: ubuntus-latest
+    runs-on: ubuntu-latest
     needs: init
     if: ${{ needs.init.outputs.nscheck }} != "Active"
 
