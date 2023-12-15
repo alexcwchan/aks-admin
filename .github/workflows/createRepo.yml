@@ -45,9 +45,9 @@ jobs:
 #    - name: Install kubectl 
 #      uses: azure/setup-kubectl@v3
       
-#    - uses: azure/use-kubelogin@v1
-#      with:
-#        kubelogin-version: 'latest'
+    - uses: azure/use-kubelogin@v1
+      with:
+        kubelogin-version: 'latest'
 
     # set context for non-interactive login    
     - name: Set AKS context
@@ -55,8 +55,8 @@ jobs:
       with:
         resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
         cluster-name: ${{ secrets.AKS_CLUSTER }}
-#        admin: false
-#        use-kubelogin: true
+        admin: false
+        use-kubelogin: true
 
     - name: Run kubectl command
       run: |
