@@ -55,7 +55,7 @@ jobs:
     - name: Check namespace status
       id: ns_check
       run: |
-        echo "status=$(kubectl get namespace | grep -q 'for-aks-admi ')" >> $GITHUB_OUTPUT
+        echo "status=$(kubectl get namespace | grep -q 'kube-system ')" >> $GITHUB_OUTPUT
 
     - name: output
       run: |
