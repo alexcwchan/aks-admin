@@ -25,6 +25,8 @@ jobs:
   init:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    outputs:
+      ns_check: ${{ steps.ns_check.outputs.status }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -51,9 +53,20 @@ jobs:
         use-kubelogin: true
 
     - name: Check namespace status
+      id: ns_check
       run: |
-        kubectl get ns for-aks -o json | jq .status.phase -r
-        echo "NS_CHECK=$(kubectl get ns for-aks -o json | jq .status.phase -r)" >> $GITHUB_ENV
+        echo "status=$(kubectl get ns for-aks-admin -o json | jq .status.phase -r)" >> $GITHUB_OUTPUT
+
+  build:
+    runs-on: ubuntus-latest
+    needs: init
+    if: ${{ needs.init.outputs.nscheck }} != "Active"
+
+    steps:
+    - name: test
+      run: |
+        echo ${{ needs.init.outputs.nscheck }}
+
 
 #    - name: Run kubectl command
 #      run: |
