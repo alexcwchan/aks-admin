@@ -60,7 +60,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: init
-    if: ${{ needs.init.outputs.ns_check }} != "Active"
+    if: ${{ needs.init.outputs.ns_check }} != Active
 
     steps:
     - name: test
