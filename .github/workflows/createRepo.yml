@@ -47,7 +47,7 @@ jobs:
       
     - uses: azure/use-kubelogin@v1
       with:
-        kubelogin-version: 'latest'
+        kubelogin-version: 'v0.0.34'
 
     # set context for non-interactive login    
     - name: Set AKS context
