@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: default-resourcesquota
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    requests.storage: 1Gi
+    
+    persistentvolumeclaims: "1"
+    pods: "4"   
+
+    configmaps: "10"
+    replicationcontrollers: "20"
+    secrets: "10"
+    services: "10"
+    services.loadbalancers: "2"
