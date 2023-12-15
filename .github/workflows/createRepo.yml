@@ -42,8 +42,21 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     # Install kubectl
-    - name: Install kubectl 
-      uses: azure/setup-kubectl@v3
+#    - name: Install kubectl 
+#      uses: azure/setup-kubectl@v3
+      
+#    - uses: azure/use-kubelogin@v1
+#      with:
+#        kubelogin-version: 'latest'
+
+    # set context for non-interactive login    
+    - name: Set AKS context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+        cluster-name: ${{ secrets.AKS_CLUSTER }}
+#        admin: false
+#        use-kubelogin: true
 
     - name: Run kubectl command
       run: |
