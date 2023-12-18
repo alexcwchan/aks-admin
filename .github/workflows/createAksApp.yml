@@ -61,19 +61,16 @@ jobs:
     - name: Check namespace status
       id: ns_check
       run: |
-        kubectl get namespace | grep '^${{ github.event.inputs.appname }} '
         echo "status=$(kubectl get namespace | grep '^${{ github.event.inputs.appname }} ' | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check ACR repository status
       id: acrrepo_check
       run: |
-        az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/'
         echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
     
     - name: Check Github repository status
       id: githubrepo_check
       run: |
-        gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"'
         echo "status=$(gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"' | wc -l)" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
