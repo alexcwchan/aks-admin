@@ -60,31 +60,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: init
-    if: ${{ needs.init.outputs.ns_check }} = 0
+    #if: ${{ needs.init.outputs.ns_check }} = 0
 
     steps:
-    - name: Azure login OIDC
-      uses: azure/login@v1
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - run: echo ${{ needs.init.outputs.ns_check }}
 
-    - uses: azure/use-kubelogin@v1
-      with:
-        kubelogin-version: 'v0.0.34'
+#    - name: Azure login OIDC
+#      uses: azure/login@v1
+#      with:
+#        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+#        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+#        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Set AKS context
-      uses: azure/aks-set-context@v3
-      with:
-        resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-        cluster-name: ${{ secrets.AKS_CLUSTER }}
-        admin: false
-        use-kubelogin: true
+#    - uses: azure/use-kubelogin@v1
+#      with:
+#        kubelogin-version: 'v0.0.34'
 
-    - name: Check namespace status
-      run: |
-        kubectl get namespace
+#    - name: Set AKS context
+#      uses: azure/aks-set-context@v3
+#      with:
+#        resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+#        cluster-name: ${{ secrets.AKS_CLUSTER }}
+#        admin: false
+#        use-kubelogin: true
+
+#    - name: Check namespace status
+#      run: |
+#        kubectl get namespace
 
 #    - name: Run kubectl command
 #      run: |
