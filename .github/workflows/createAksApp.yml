@@ -59,13 +59,12 @@ jobs:
     - name: Check ACR repository status
       id: acrrepo_check
       run: |
-        echo "status=$(az acr repository list -n acrakszup2kwh4fwbse.azurecr.io | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
+        echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
     
     - name: Check Github repository status
       id: githubrepo_check
       run: |
-        gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"' | wc -l
-#        echo "status=$(gh repo list ${{ secrets.GH_ORG }} | wc -l)" >> $GITHUB_OUTPUT
+        echo "status=$(gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"' | wc -l)" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -73,7 +72,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: initCheck
-    if: ${{ needs.initCheck.outputs.ns_check == '0' && needs.initCheck.outputs.acrrepo_check == '0' }}
+    if: ${{ needs.initCheck.outputs.ns_check == '0' && needs.initCheck.outputs.acrrepo_check == '0' && needs.initCheck.outputs.githubrepo_check == '0' }}
 
     steps:
       - run: |
