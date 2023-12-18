@@ -64,7 +64,7 @@ jobs:
     - name: Check Github repository status
       id: githubrepo_check
       run: |
-        gh repo list ${{ secrets.GH_ORG }} | grep '/${{ github.event.inputs.appname }} ' | wc -l
+        gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"' | wc -l
 #        echo "status=$(gh repo list ${{ secrets.GH_ORG }} | wc -l)" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
