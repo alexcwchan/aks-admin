@@ -55,7 +55,7 @@ jobs:
     - name: Check namespace status
       id: ns_check
       run: |
-        echo "status=$(kubectl get namespace | grep '${{ github.event.inputs.appname }} ' | wc -l)" >> $GITHUB_OUTPUT
+        echo "status=$(kubectl get namespace | grep '^${{ github.event.inputs.appname }} ' | wc -l)" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
