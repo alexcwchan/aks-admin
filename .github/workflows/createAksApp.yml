@@ -64,7 +64,7 @@ jobs:
 
     - name: Check ACR repository
       id: acrrepo_check
-      run: echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ env.APP_NAME }}/' | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(az acr repository list -n ${{ env.AZURE_ACR }} | grep '\"${{ env.APP_NAME }}/' | wc -l)" >> $GITHUB_OUTPUT
     
     - name: Check Github repository
       id: githubrepo_check
@@ -129,7 +129,7 @@ jobs:
 #        az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
     - name: Create ACR repository token
-      run: echo "ACR_SECRET=$(az acr token create --name ${{ env.ACR_TOKEN }} --registry ${{ secrets.ACR }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
+      run: echo "ACR_SECRET=$(az acr token create --name ${{ env.ACR_TOKEN }} --registry ${{ env.AZURE_ACR }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
 
     - name: Debug
       run: |
