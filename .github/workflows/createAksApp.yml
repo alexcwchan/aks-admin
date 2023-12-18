@@ -1,4 +1,4 @@
-name: Create AKS App and repository
+name: Create AKS App
 
 # Controls when the workflow will run
 on:
@@ -22,17 +22,16 @@ permissions:
 
 jobs:
 
-  init:
+  initCheck:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     outputs:
       ns_check: ${{ steps.ns_check.outputs.status }}
+      acrrepo_check: ${{ steps.acrrepo_check.outputs.status }}
+      githubrepo_check: ${{ steps.githubrepo_check.outputs.status }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v4
-      
     - name: Azure login OIDC
       uses: azure/login@v1
       with:
@@ -57,13 +56,32 @@ jobs:
       run: |
         echo "status=$(kubectl get namespace | grep '^${{ github.event.inputs.appname }} ' | wc -l)" >> $GITHUB_OUTPUT
 
+    - name: Check ACR repository status
+      id: acrrepo_check
+      run: |
+        echo "status=$(az acr repository list -n acrakszup2kwh4fwbse.azurecr.io | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
+    
+    - name: Check Github repository status
+      id: githubrepo_check
+      run: |
+        echo gh repo list 
+        echo "status=$(gh repo list | wc -l)" >> $GITHUB_OUTPUT
+
+
+
   build:
     runs-on: ubuntu-latest
-    needs: init
-    if: ${{ needs.init.outputs.ns_check == '0' }}
+    needs: initCheck
+    if: ${{ needs.initCheck.outputs.ns_check == '0' && needs.initCheck.outputs.acrrepo_check == '0' }}
 
     steps:
-      - run: echo ${{ needs.init.outputs.ns_check }}
+      - run: |
+          echo ${{ needs.initCheck.outputs.ns_check }}
+          echo ${{ needs.initCheck.outputs.acrrepo_check }}
+
+#      - name: Checkout the repository
+#        uses: actions/checkout@v4
+
 
 #    - name: Azure login OIDC
 #      uses: azure/login@v1
