@@ -129,7 +129,9 @@ jobs:
 #        az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
     - name: Create ACR repository token
-      run: echo "ACR_SECRET=$(az acr token create --name ${{ env.ACR_TOKEN }} --registry ${{ vars.AZURE_ACR }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
+      run: |
+        az acr repository list -n ${{ vars.AZURE_ACR }}
+        echo "ACR_SECRET=$(az acr token create --name ${{ env.ACR_TOKEN }} --registry ${{ vars.AZURE_ACR }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
 
     - name: Debug
       run: |
