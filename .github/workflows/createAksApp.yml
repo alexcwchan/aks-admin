@@ -15,10 +15,9 @@ permissions:
   contents: read
 #  actions: read
 
-#env:
-#  APP_NAME: ${{ github.event.inputs.appname }}
-#  AZURE_APP_NAME: aks-app-${{ github.event.inputs.appname }}
-#  AZURE_ACR_TOKEN: "aks-app-${{ github.event.inputs.appname }}"
+env:
+  APP_NAME: aks-app-${{ github.event.inputs.appname }}
+  ACR_TOKEN: "aks-app-${{ github.event.inputs.appname }}"
 
 jobs:
 
@@ -40,7 +39,8 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - uses: azure/use-kubelogin@v1
+    - name: kubelogin with AKS
+      uses: azure/use-kubelogin@v1
       with:
         kubelogin-version: 'v0.0.34'
 
@@ -52,46 +52,52 @@ jobs:
         admin: false
         use-kubelogin: true
 
-    - name: Check App registration status
+    - name: Check Azure App registration
       id: app_check
       run: echo "status=0" >> $GITHUB_OUTPUT
-#        az ad app list --filter "displayname eq '${{ github.event.inputs.appname }}'" --output tsv | wc -l
-#        echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
+#        az ad app list --filter "displayname eq '${{ env.APP_NAME }}'" --output tsv | wc -l
+#        echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ env.APP_NAME }}/' | wc -l)" >> $GITHUB_OUTPUT
 
-    - name: Check namespace status
+    - name: Check AKS namespace
       id: ns_check
-      run: |
-        echo "status=$(kubectl get namespace | grep '^${{ github.event.inputs.appname }} ' | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(kubectl get namespace | grep '^${{ env.APP_NAME }} ' | wc -l)" >> $GITHUB_OUTPUT
 
-    - name: Check ACR repository status
+    - name: Check ACR repository
       id: acrrepo_check
-      run: |
-        echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ env.APP_NAME }}/' | wc -l)" >> $GITHUB_OUTPUT
     
-    - name: Check Github repository status
+    - name: Check Github repository
       id: githubrepo_check
-      run: |
-        echo "status=$(gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"' | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ env.APP_NAME }}\"' | wc -l)" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+    - name: Debug check status
+      run: |
+        echo "App check: ${{ needs.initCheck.outputs.app_check }}"
+        echo "Namespace check: ${{ needs.initCheck.outputs.ns_check }}"
+        echo "ARC repository check: ${{ needs.initCheck.outputs.acrrepo_check }}"
+        echo "Github repository: ${{ needs.initCheck.outputs.githubrepo_check }}"
 
-  build:
+
+  deploy:
     runs-on: ubuntu-latest
     needs: initCheck
+    # only run this step if all checks return false
     if: ${{ needs.initCheck.outputs.app_check == '0' && needs.initCheck.outputs.ns_check == '0' && needs.initCheck.outputs.acrrepo_check == '0' && needs.initCheck.outputs.githubrepo_check == '0' }}
 
     steps:
-    - run: |
-        echo ${{ needs.initCheck.outputs.app_check }}
-        echo ${{ needs.initCheck.outputs.ns_check }}
-        echo ${{ needs.initCheck.outputs.acrrepo_check }}
-        echo ${{ needs.initCheck.outputs.githubrepo_check }}
+    - name: Checkout the repository
+      uses: actions/checkout@v4
 
-
-#      - name: Checkout the repository
-#        uses: actions/checkout@v4
-
+    - name: Replace token with env variables
+      uses: cschleiden/replace-tokens@v1
+      with:
+        tokenPrefix: '#{'
+        tokenSuffix: '}#'
+        files: '["./federated-credential.json"]'
+      env:
+        APP_NAME: ${{ env.APP_NAME }}
 
 #    - name: Azure login OIDC
 #      uses: azure/login@v1
@@ -99,8 +105,9 @@ jobs:
 #        client-id: ${{ secrets.AZURE_CLIENT_ID }}
 #        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 #        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-#    - uses: azure/use-kubelogin@v1
+    
+#    - name: kubelogin with AKS
+#      uses: azure/use-kubelogin@v1
 #      with:
 #        kubelogin-version: 'v0.0.34'
 
@@ -111,26 +118,6 @@ jobs:
 #        cluster-name: ${{ secrets.AKS_CLUSTER }}
 #        admin: false
 #        use-kubelogin: true
-
-#    - name: Check namespace status
-#      run: |
-#        kubectl get namespace
-
-#    - name: Run kubectl command
-#      run: |
-#        kubectl create namespace for-aks-admin
-
-
-#    - name: Replace token with env variables
-#      uses: cschleiden/replace-tokens@v1
-#      with:
-#        tokenPrefix: '#{'
-#        tokenSuffix: '}#'
-#        files: '["./federated-credential.json"]'
-#      env:
-#        APP_NAME: ${{ env.APP_NAME }}
-
-
 
 #    - name: Register an App
 #      run: |
