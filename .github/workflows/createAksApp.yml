@@ -66,7 +66,8 @@ jobs:
       run: |
         echo gh repo list 
         echo "status=$(gh repo list | wc -l)" >> $GITHUB_OUTPUT
-
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 
   build:
