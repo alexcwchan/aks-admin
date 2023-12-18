@@ -51,19 +51,28 @@ jobs:
         admin: false
         use-kubelogin: true
 
+    - name: Check App registration status
+      id: app_check
+      run: |
+        az ad app list
+#        echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTP
+
     - name: Check namespace status
       id: ns_check
       run: |
+        kubectl get namespace | grep '^${{ github.event.inputs.appname }} '
         echo "status=$(kubectl get namespace | grep '^${{ github.event.inputs.appname }} ' | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check ACR repository status
       id: acrrepo_check
       run: |
+        az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/'
         echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
     
     - name: Check Github repository status
       id: githubrepo_check
       run: |
+        gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"'
         echo "status=$(gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ github.event.inputs.appname }}\"' | wc -l)" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -75,9 +84,11 @@ jobs:
     if: ${{ needs.initCheck.outputs.ns_check == '0' && needs.initCheck.outputs.acrrepo_check == '0' && needs.initCheck.outputs.githubrepo_check == '0' }}
 
     steps:
-      - run: |
-          echo ${{ needs.initCheck.outputs.ns_check }}
-          echo ${{ needs.initCheck.outputs.acrrepo_check }}
+    - run: |
+        echo ${{ needs.initCheck.outputs.ns_check }}
+        echo ${{ needs.initCheck.outputs.acrrepo_check }}
+        echo ${{ needs.initCheck.outputs.githubrepo_check }}
+
 
 #      - name: Checkout the repository
 #        uses: actions/checkout@v4
