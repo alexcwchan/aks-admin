@@ -74,10 +74,10 @@ jobs:
 
     - name: Debug check status
       run: |
-        echo "App check: ${{ needs.initCheck.outputs.app_check }}"
-        echo "Namespace check: ${{ needs.initCheck.outputs.ns_check }}"
-        echo "ARC repository check: ${{ needs.initCheck.outputs.acrrepo_check }}"
-        echo "Github repository: ${{ needs.initCheck.outputs.githubrepo_check }}"
+        echo "App check: ${{ steps.app_check.outputs.status }}"
+        echo "Namespace check: ${{ steps.ns_check.outputs.status }}"
+        echo "ARC repository check: ${{ steps.acrrepo_check.outputs.status }}"
+        echo "Github repository: ${{ steps.githubrepo_check.outputs.status }}"
 
 
   deploy:
