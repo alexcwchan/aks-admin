@@ -54,8 +54,7 @@ jobs:
 
     - name: Check App registration status
       id: app_check
-      run: |
-        echo "status=0" >> $GITHUB_OUTPUT
+      run: echo "status=0" >> $GITHUB_OUTPUT
 #        az ad app list --filter "displayname eq '${{ github.event.inputs.appname }}'" --output tsv | wc -l
 #        echo "status=$(az acr repository list -n ${{ secrets.ACR }} | grep '\"${{ github.event.inputs.appname }}/' | wc -l)" >> $GITHUB_OUTPUT
 
