@@ -147,6 +147,7 @@ jobs:
         kubectl create namespace ${{ env.APP_NAME }}
         kubectl apply -f ./NetworkPolicy.yaml -f ./ResourceQuota.yaml -f ./PersistentVolumeClaim.yaml -n ${{ env.APP_NAME }}
         echo "AKS_PVC=$(kubectl get pvc aks-app-app1-pvc -o=custom-columns="volume:.spec.volumeName" --no-headers -n aks-app-app1)" >> $GITHUB_ENV
+        echo ${{ env.AKS_PVC }}
 
     - name: Create Stroage account SAS
       run: |
@@ -179,4 +180,5 @@ jobs:
         cat ./federated-credential.json
         echo ${{ env.APP_NAME }}
         echo ${{ env.AZURE_APP_ID }}
+        echo ${{ env.AKS_PVC }}
         echo ${{ env.AZURE_SA_SAS }}
