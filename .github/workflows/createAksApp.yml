@@ -63,7 +63,7 @@ jobs:
 
     - name: Check ACR repository
       id: acrrepo_check
-      run: echo "status=$(az acr repository list -n ${{ vars.ACR_REGISTRY }} --query "[?contains(@, `${{ env.APP_NAME }}`]" --output tsv | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(az acr repository list -n ${{ vars.ACR_REGISTRY }} --query "[?contains(@, '${{ env.APP_NAME }}')]" --output tsv | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check ACR token
       id: acrtoken_check
