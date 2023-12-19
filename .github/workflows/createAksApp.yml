@@ -170,14 +170,14 @@ jobs:
     - name: Create Stroage account SAS
       run: |
         echo "AKS_PVC=$(kubectl get pvc ${{ env.APP_NAME }}-pvc -o=custom-columns="volume:.spec.volumeName" --no-headers -n ${{ env.APP_NAME }})" >> $GITHUB_ENV
-#        az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --account-name ${{ vars.AZURE_SA }} --account-key ${{ secrets.AZURE_SA_KEY }} --expiry 2047-06-30T16:00:00Z --permissions cdlrw
-#        echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.APP_NAME }} --policy-name ${{ env.APP_NAME }} --account-name ${{ vars.AZURE_SA }} --account-key ${{ secrets.AZURE_SA_KEY }})" >> $GITHUB_ENV
+        az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --account-name ${{ vars.AZURE_SA }} --account-key ${{ secrets.AZURE_SA_KEY }} --expiry 2047-06-30T16:00:00Z --permissions cdlrw
+        echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.APP_NAME }} --policy-name ${{ env.APP_NAME }} --account-name ${{ vars.AZURE_SA }} --account-key ${{ secrets.AZURE_SA_KEY }})" >> $GITHUB_ENV
 #        az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --account-name ${{ vars.AZURE_STORAGE_ACCOUNT }} --file-endpoint https://${{ vars.AZURE_STORAGE_ACCOUNT }}.file.core.windows.net --sas-token [use SAS token instead of account key] --expiry 2047-06-30T16:00:00Z
 
     - name: Debug
       run: |
         cat ./federated-credential.json
-        echo ${{ env.APP_NAME }}
-        echo ${{ env.AZURE_APP_ID }}
-        echo ${{ env.AKS_PVC }}
-        echo ${{ env.AZURE_SA_SAS }}
+        echo "App Name: ${{ env.APP_NAME }}"
+        echo "App ID: ${{ env.AZURE_APP_ID }}"
+        echo "PVC Name: ${{ env.AKS_PVC }}"
+        echo "Share SAS: ${{ env.AZURE_SA_SAS }}"
