@@ -142,18 +142,25 @@ jobs:
     - name: Create ACR repository token
       run: echo "ACR_SECRET=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
 
+    - name: Create AKS namespace, apply resource quota and network policy
+      run: |
+        kubectl create namespace ${{ env.APP_NAME }}
+        kubectl apply -f networkpolicy.yaml -f resourcequota.yaml -n ${{ env.APP_NAME }}
+
+    - name: Create Github repository
+      run: |
+        gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --private
+        gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$token"
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        token: ${{ env.ACR_SECRET }}
+
     - name: Debug
       run: |
         cat ./federated-credential.json
-        echo $APP_NAME
-        echo $AZURE_APP_ID
-        echo $ACR_TOKEN
-        echo $ACR_SECRET
-
-#    - name: Create AKS namespace, apply resource quota and network policy
-#      run: |
-#        kubectl create namespace ${{ env.APP_NAME }}
-#        kubectl apply -f networkpolicy.yaml -f resourcequota.yaml -n ${{ env.APP_NAME }}
+        echo ${{ env.APP_NAME }}
+        echo ${{ env.AZURE_APP_ID }}
+        echo ${{ env.ACR_SECRET }}
 
 #      - name: Azure CLI script
 #        uses: azure/CLI@v1
@@ -162,11 +169,5 @@ jobs:
 #          inlineScript: |
 #            az ad app create --display-name ${{ github.event.inputs.name }} --query []."id" | awk -F '"' '{print $2}'
 
-      # run gh cli to manage new repo
-#      - run: |
-#          gh repo create ${{ github.event.inputs.name }} --template alexcwchan/aks_template --private
-#          gh secret set AKS_TOKEN --repo alexcwchan/${{ github.event.inputs.name }} --body "$token"
-#        env:
-#          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-#          token: "123"
+
 
