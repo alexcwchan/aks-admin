@@ -58,7 +58,7 @@ jobs:
 
     - name: Check AKS namespace
       id: ns_check
-      run: echo "status=$(kubectl get namespace ${{ env.APP_NAME }} --ignore-not-found true --no-headers true | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(kubectl get namespace ${{ env.APP_NAME }} --ignore-not-found --no-headers | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check ACR repository
       id: acrrepo_check
@@ -105,7 +105,7 @@ jobs:
       with:
         tokenPrefix: '#{'
         tokenSuffix: '}#'
-        files: '["./federated-credential.json"]'
+        files: '["./federated-credential.json", "./PersistentVolumeClaim.yaml"]'
       env:
         APP_NAME: ${{ env.APP_NAME }}
         GH_ORG: ${{ vars.GH_ORG }}
@@ -142,10 +142,17 @@ jobs:
     - name: Create ACR repository token
       run: echo "ACR_TOKEN_PW=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
 
-    - name: Create AKS namespace, apply resource quota and network policy
+    - name: Create AKS namespace, apply resource quota, network policy and PVC
       run: |
         kubectl create namespace ${{ env.APP_NAME }}
-        kubectl apply -f ./networkpolicy.yaml -f ./resourceqouta.yaml -n ${{ env.APP_NAME }}
+        kubectl apply -f ./NetworkPolicy.yaml -f ./ResourceQuota.yaml -f ./PersistentVolumeClaim.yaml -n ${{ env.APP_NAME }}
+        echo "AKS_PVC=$(kubectl get pvc aks-app-app1-pvc -o=custom-columns="volume:.spec.volumeName" --no-headers -n aks-app-app1)" >> $GITHUB_ENV
+
+    - name: Create Stroage account SAS
+      run: |
+        az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --account-name ${{ vars.AZURE_SA }} --account-key ${{ secrets.AZURE_SA_KEY }} --expiry 2047-06-30T16:00:00Z --permissions cdlrw
+        echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.APP_NAME }} --policy-name ${{ env.APP_NAME }} --account-name ${{ vars.AZURE_SA }} --account-key ${{ secrets.AZURE_SA_KEY }})" >> $GITHUB_ENV
+#        az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --account-name ${{ vars.AZURE_STORAGE_ACCOUNT }} --file-endpoint https://${{ vars.AZURE_STORAGE_ACCOUNT }}.file.core.windows.net --sas-token [use SAS token instead of account key] --expiry 2047-06-30T16:00:00Z
 
     - name: Create Github repository
       run: |
@@ -163,13 +170,13 @@ jobs:
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         ACR_TOKEN: ${{ env.ACR_TOKEN_PW }}
-        ACR_REGISTRY: 'acrakszup2kwh4fwbse.azurecr.io'
-        AKS_CLUSTER: 'aks-zup2kwh4fwbse'
-        AKS_RESOURCE_GROUP: 'rg-dev-eas-aks-01'
+        ACR_REGISTRY: acrakszup2kwh4fwbse.azurecr.io
+        AKS_CLUSTER: aks-zup2kwh4fwbse
+        AKS_RESOURCE_GROUP: rg-dev-eas-aks-01
 
     - name: Debug
       run: |
         cat ./federated-credential.json
         echo ${{ env.APP_NAME }}
         echo ${{ env.AZURE_APP_ID }}
-        echo ${{ env.ACR_TOKEN_PW }}
+        echo ${{ env.AZURE_SA_SAS }}
