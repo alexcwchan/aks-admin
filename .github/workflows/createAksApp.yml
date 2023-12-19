@@ -150,13 +150,13 @@ jobs:
     - name: Create Github repository
       run: |
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --private
-        gh secret set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_CLIENT_ID"
-        gh secret set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_SUBSCRIPTION_ID"
-        gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_TENANT_ID"
-        gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_TOKEN"
-        gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "ACR_REGISTRY"
-        gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "AKS_CLUSTER"
-        gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "AKS_RESOURCE_GROUP"
+        gh variable set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_CLIENT_ID"
+        gh variable set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_SUBSCRIPTION_ID"
+        gh variable set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_TENANT_ID"
+        gh variable set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_TOKEN"
+        gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body $ACR_REGISTRY"
+        gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_CLUSTER"
+        gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_RESOURCE_GROUP"
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         AZURE_CLIENT_ID: ${{ env.AZURE_APP_ID }}
