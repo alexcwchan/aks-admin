@@ -130,22 +130,22 @@ jobs:
         admin: false
         use-kubelogin: true
 
-    - name: Register an App
-      run: echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.APP_NAME }} --query "appId" --output tsv)" >> $GITHUB_ENV
+#    - name: Register an App
+#      run: echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.APP_NAME }} --query "appId" --output tsv)" >> $GITHUB_ENV
 
-    - name: Add App owner
-      run: az ad app owner add --id ${{ env.AZURE_APP_ID }} --owner-object-id b14a3839-eae6-453b-a37f-0e12ff845aa4
+#    - name: Add App owner
+#      run: az ad app owner add --id ${{ env.AZURE_APP_ID }} --owner-object-id b14a3839-eae6-453b-a37f-0e12ff845aa4
 
-    - name: Create Federated Credential
-      run: az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
+#    - name: Create Federated Credential
+#      run: az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
-    - name: Create ACR repository token
-      run: echo "ACR_SECRET=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
+#    - name: Create ACR repository token
+#      run: echo "ACR_SECRET=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.APP_NAME }}/* content/write content/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
 
     - name: Create AKS namespace, apply resource quota and network policy
       run: |
         kubectl create namespace ${{ env.APP_NAME }}
-        kubectl apply -f networkpolicy.yaml -f resourcequota.yaml -n ${{ env.APP_NAME }}
+        kubectl apply -f ./networkpolicy.yaml -f ./resourceqouta.yaml -n ${{ env.APP_NAME }}
 
     - name: Create Github repository
       run: |
@@ -158,6 +158,8 @@ jobs:
     - name: Debug
       run: |
         cat ./federated-credential.json
+        cat ./networkpolicy.yaml
+        cat ./resourceqouta.yaml
         echo ${{ env.APP_NAME }}
         echo ${{ env.AZURE_APP_ID }}
         echo ${{ env.ACR_SECRET }}
