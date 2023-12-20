@@ -8,7 +8,7 @@ spec:
     requests.memory: 1Gi
     limits.cpu: "2"
     limits.memory: 2Gi
-    requests.storage: 1Gi
+    requests.storage: #{PVC_SIZE}#Gi
     configmaps: "10"
     persistentvolumeclaims: "1"
     pods: "10"
