@@ -7,8 +7,11 @@ on:
     inputs:
       appname:
         description: New Application Name
-        type: string
         required: true
+      pvc:
+        description: Persistent Volume size (default, 1Gi)
+        required: true
+        default: 1
 
 permissions:
   id-token: write
@@ -109,6 +112,7 @@ jobs:
       env:
         APP_NAME: ${{ env.APP_NAME }}
         GH_ORG: ${{ vars.GH_ORG }}
+        PVC_SIZE: ${{ inputs.pvc }}
 
     - name: Azure login OIDC
       uses: azure/login@v1
