@@ -149,10 +149,12 @@ jobs:
         sleep 5
         echo "AKS_PVC=$(kubectl get pvc ${{ env.APP_NAME }}-pvc -o=custom-columns="volume:.spec.volumeName" --no-headers -n ${{ env.APP_NAME }})" >> $GITHUB_ENV
 
-    - name: Create Stroage account SAS
+#     comment: use policy to control SAS
+#     az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --expiry 2047-06-30T16:00:00Z --permissions cdlrw
+#     echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.AKS_PVC }} --policy-name ${{ env.APP_NAME }} --output tsv)" >> $GITHUB_ENV
+    - name: Create file share SAS
       run: |
-        az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --expiry 2047-06-30T16:00:00Z --permissions cdlrw
-        echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.AKS_PVC }} --policy-name ${{ env.APP_NAME }} --output tsv)" >> $GITHUB_ENV
+        echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.AKS_PVC }} -expiry 2047-06-30T16:00:00Z --permissions cdlrw --output tsv)" >> $GITHUB_ENV
       env:
         AZURE_STORAGE_KEY: ${{ secrets.AZURE_SA_KEY }}
         AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_SA }}
