@@ -188,6 +188,13 @@ jobs:
         AKS_CLUSTER: aks-zup2kwh4fwbse
         AKS_RESOURCE_GROUP: rg-dev-eas-aks-01
 
+    - name: Run Github repository actions
+      run: |
+        gh workflow run clone_image.yml -f image=mysql -f tag=8.2.0 -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
+        gh workflow run clone_image.yml -f image=php -f tag=php_zts-alpine3.19 -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
     - name: Debug
       run: |
         cat ./federated-credential.json
