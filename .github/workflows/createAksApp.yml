@@ -12,6 +12,10 @@ on:
         description: Persistent Volume size (default, 1Gi)
         required: true
         default: 1
+      agentpool:
+        description: Assigned AKS NodePool
+        required: true
+        default: npuser01
 
 permissions:
   id-token: write
@@ -174,7 +178,9 @@ jobs:
         gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_TENANT_ID"
         gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_REGISTRY"
         gh variable set ACR_REPO --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_REPO"
+        gh variable set AKS_AGENTPOOL --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_AGENTPOOL"
         gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_CLUSTER"
+        gh variable set AKS_NAMESPACE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_NAMESPACE"
         gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_RESOURCE_GROUP"
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -185,13 +191,15 @@ jobs:
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         ACR_REGISTRY: acrakszup2kwh4fwbse.azurecr.io
         ACR_REPO: ${{ env.ACR_REPO }}
+        AKS_AGENTPOOL: ${{ inputs.agentpool }}
         AKS_CLUSTER: aks-zup2kwh4fwbse
+        AKS_NAMESPACE: ${{ env.APP_NAME }}
         AKS_RESOURCE_GROUP: rg-dev-eas-aks-01
 
     - name: Run Github repository actions
       run: |
         gh workflow run clone_image.yml -f image=mysql -f tag=8.2.0 -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
-        gh workflow run clone_image.yml -f image=php -f tag=php_zts-alpine3.19 -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
+        gh workflow run build_image.yml -f name=${{ inputs.appname }} -f tag=1.0 -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
