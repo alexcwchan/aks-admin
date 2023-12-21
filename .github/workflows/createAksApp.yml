@@ -198,8 +198,9 @@ jobs:
 
     - name: Run Github repository actions
       run: |
-        gh workflow run clone_image.yml -f image=mysql -f tag=8.2.0 -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
-        gh workflow run build_image.yml -f name=${{ inputs.appname }} -f tag=1.0 -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
+        gh workflow run build_image.yml -f tag=beta -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
+        sleep 60
+        gh workflow run deploy_app.yml -f tag=beta -f url=www.example.com -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
