@@ -1,8 +1,6 @@
 name: Create AKS App
 
-# Controls when the workflow will run
 on:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
       appname:
@@ -173,6 +171,7 @@ jobs:
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --private
         gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_TOKEN"
         gh secret set ACR_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_USER"
+        gh secret set APP_NAME --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$APP_NAME"
         gh secret set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_CLIENT_ID"
         gh secret set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_SUBSCRIPTION_ID"
         gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_TENANT_ID"
@@ -186,28 +185,31 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         ACR_TOKEN: ${{ env.ACR_TOKEN_PW }}
         ACR_USER: ${{ env.APP_NAME }}
+        APP_NAME: ${{ env.APP_NAME }}
         AZURE_CLIENT_ID: ${{ env.AZURE_APP_ID }}
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        ACR_REGISTRY: acrakszup2kwh4fwbse.azurecr.io
+        ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
         ACR_REPO: ${{ env.ACR_REPO }}
         AKS_AGENTPOOL: ${{ inputs.agentpool }}
-        AKS_CLUSTER: aks-zup2kwh4fwbse
+        AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
         AKS_NAMESPACE: ${{ env.APP_NAME }}
-        AKS_RESOURCE_GROUP: rg-dev-eas-aks-01
+        AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
 
-    - name: Run Github repository actions
-      run: |
-        gh workflow run build_image.yml -f tag=beta -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
-        sleep 60
-        gh workflow run deploy_app.yml -f tag=beta -f url=www.example.com -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+#    - name: Run Github repository actions
+#      run: |
+#        gh workflow run build_image.yml -f tag=beta -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
+#        sleep 60
+#        gh workflow run deploy_app.yml -f tag=beta -f url=www.example.com -R ${{ vars.GH_ORG }}/${{ env.APP_NAME }}
+#      env:
+#        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Debug
       run: |
         cat ./federated-credential.json
-        echo "App Name: ${{ env.APP_NAME }}"
+        echo "App name: ${{ env.APP_NAME }}"
         echo "App ID: ${{ env.AZURE_APP_ID }}"
-        echo "PVC Name: ${{ env.AKS_PVC }}"
-        echo "Share SAS: ${{ env.AZURE_SA_SAS }}"
+        echo "PVC name: ${{ env.AKS_PVC }}"
+        echo "File share SAS: ${{ env.AZURE_SA_SAS }}"
+        echo "ACR token password (space seperated):"
+        echo ${{ env.ACR_TOKEN_PW }} | sed 's/./& /g'
