@@ -149,7 +149,7 @@ jobs:
       run: az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
     - name: Create Service Principal
-      run: echo "AZURE_SP_ID=$(az ad sp create --id ${{ env.AZURE_APP_ID }} --query objectId --output tsv) >> $GITHUB_ENV
+      run: echo "AZURE_SP_ID=$(az ad sp create --id ${{ env.AZURE_APP_ID }} --query objectId --output tsv)" >> $GITHUB_ENV
 
     - name: Create ACR repository token
       run: echo "ACR_TOKEN_PW=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.ACR_REPO }} content/delete content/read content/write metadata/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
