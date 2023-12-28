@@ -123,7 +123,7 @@ jobs:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    
+
     - name: kubelogin with AKS
       uses: azure/use-kubelogin@v1
       with:
@@ -176,24 +176,24 @@ jobs:
     - name: Create Github repository
       run: |
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --private
-        gh variable set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_TOKEN"
-        gh variable set ACR_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_USER"
-        gh variable set APP_NAME --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$APP_NAME"
-        gh variable set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_CLIENT_ID"
-        gh variable set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_SUBSCRIPTION_ID"
-        gh variable set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_TENANT_ID"
 
+        gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_TOKEN"
+        gh secret set AKS_AGENTPOOL --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_AGENTPOOL"
+        gh secret set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_CLIENT_ID"
+        gh secret set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_SUBSCRIPTION_ID"
+        gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_TENANT_ID"
+        gh secret set DB_PASSWORD --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_PASSWORD"
+
+        gh variable set ACR_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_USER"
         gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_REGISTRY"
         gh variable set ACR_REPO --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_REPO"
-        gh variable set AKS_AGENTPOOL --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_AGENTPOOL"
         gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_CLUSTER"
         gh variable set AKS_NAMESPACE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_NAMESPACE"
         gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_RESOURCE_GROUP"
-
-        gh variable set DB_HOST --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_HOST"
+        gh variable set APP_NAME --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$APP_NAME"
         gh variable set DB_DATABASE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_DATABASE"
+        gh variable set DB_HOST --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_HOST"
         gh variable set DB_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_USER"
-        gh variable set DB_PASSWORD --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_PASSWORD"
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         ACR_TOKEN: ${{ env.ACR_TOKEN_PW }}
@@ -231,3 +231,4 @@ jobs:
         echo "File share SAS: ${{ env.AZURE_SA_SAS }}"
         echo "ACR token (space seperated):"
         echo ${{ env.ACR_TOKEN_PW }} | sed 's/./& /g'
+#        echo "Mysql DB: ${{ env.DB_DATABASE }}, User: ${{ env.DB_USER }}, PW: ${{ env.DB_PASSWORD }}"
