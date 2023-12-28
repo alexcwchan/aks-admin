@@ -13,10 +13,6 @@ spec:
           - key: namespace
             operator: In
             values: ["default", "kube-system"]
-    - from:
-      # Application Gateway Subnet
       - ipBlock:
+          # Application Gateway Subnet
           cidr: 10.26.20.16/28
-      ports:
-        - port: 80
-        - port: 443

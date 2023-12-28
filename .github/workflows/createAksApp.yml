@@ -189,6 +189,11 @@ jobs:
         gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_CLUSTER"
         gh variable set AKS_NAMESPACE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_NAMESPACE"
         gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_RESOURCE_GROUP"
+
+        gh variable set DB_HOST --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_HOST"
+        gh variable set DB_DATABASE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_DATABASE"
+        gh variable set DB_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_USER"
+        gh variable set DB_PASSWORD --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_PASSWORD"
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         ACR_TOKEN: ${{ env.ACR_TOKEN_PW }}
@@ -203,6 +208,10 @@ jobs:
         AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
         AKS_NAMESPACE: ${{ env.APP_NAME }}
         AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
+        DB_HOST: mysql-dev-ust.mysql.database.azure.com
+        DB_DATABASE: aks_app_newapp
+        DB_USER: aks_app_newapp
+        DB_PASSWORD: 123qweasdzxc
 
 #    - name: Run Github repository actions
 #      run: |
