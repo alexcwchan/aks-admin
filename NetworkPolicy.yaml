@@ -13,3 +13,5 @@ spec:
         - key: namespace
           operator: In
           values: ["default", "kube-system"]
+    - ipBlock:
+        cidr: 10.26.20.16/28
