@@ -1,9 +1,10 @@
 # aks-admin
-This repository is to setup a container app infrastructure for deployement to Azure AKS, which includes below:
-- Azure resources
-    - Application and Service Prinpicle, Federation Credentials for Github repository
-    - ACR Token and scope map
+This repository is for setup container app infrastructure and deployement to Azure AKS, which includes setup of below:
+- Azure resources (Dev, UAT AND PROD)
+    - Application and service principal, federation credentials for Github repository
+    - ACR token and scope map
     - AKS namespace, resources quota, network policy and PVC
 - Github repository
     - clone template repository
-    - create necessary Github Actions and Variables
+    - repository secrets and variables
+    - Actions CI/CD workflows
