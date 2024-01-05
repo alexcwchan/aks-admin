@@ -101,6 +101,8 @@ jobs:
         needs.initCheck.outputs.acrtoken_check == '0' &&
         needs.initCheck.outputs.githubrepo_check == '0'
       }}
+    env: 
+      AKS_ENV: dev
 
     steps:
     - name: Checkout the repository
@@ -115,6 +117,7 @@ jobs:
       env:
         APP_NAME: ${{ env.APP_NAME }}
         GH_ORG: ${{ vars.GH_ORG }}
+        GH_BRANCH: ${{ env.AKS_ENV }}
         PVC_SIZE: ${{ inputs.pvc }}
 
     - name: Azure login OIDC
@@ -175,25 +178,29 @@ jobs:
 
     - name: Create Github repository
       run: |
-        gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --private
+        gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --include-all-branches --private
+      env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-        gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_TOKEN"
-        gh secret set AKS_AGENTPOOL --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_AGENTPOOL"
-        gh secret set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_CLIENT_ID"
-        gh secret set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_SUBSCRIPTION_ID"
-        gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AZURE_TENANT_ID"
-        gh secret set DB_PASSWORD --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_PASSWORD"
+    - name: Create Github Dev Branch info
+      run: |          
+        gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_TOKEN"
+        gh secret set AKS_AGENTPOOL --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_AGENTPOOL"
+        gh secret set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AZURE_CLIENT_ID"
+        gh secret set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AZURE_SUBSCRIPTION_ID"
+        gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AZURE_TENANT_ID"
+        gh secret set DB_PASSWORD --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_PASSWORD"
 
-        gh variable set ACR_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_USER"
-        gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_REGISTRY"
-        gh variable set ACR_REPO --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$ACR_REPO"
-        gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_CLUSTER"
-        gh variable set AKS_NAMESPACE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_NAMESPACE"
-        gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$AKS_RESOURCE_GROUP"
-        gh variable set APP_NAME --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$APP_NAME"
-        gh variable set DB_DATABASE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_DATABASE"
-        gh variable set DB_HOST --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_HOST"
-        gh variable set DB_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --body "$DB_USER"
+        gh variable set ACR_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_USER"
+        gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_REGISTRY"
+        gh variable set ACR_REPO --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_REPO"
+        gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_CLUSTER"
+        gh variable set AKS_NAMESPACE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_NAMESPACE"
+        gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_RESOURCE_GROUP"
+        gh variable set APP_NAME --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$APP_NAME"
+        gh variable set DB_DATABASE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_DATABASE"
+        gh variable set DB_HOST --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_HOST"
+        gh variable set DB_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_USER"
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         ACR_TOKEN: ${{ env.ACR_TOKEN_PW }}
