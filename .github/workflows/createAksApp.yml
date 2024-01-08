@@ -191,7 +191,7 @@ jobs:
     - name: Create Github repository
       run: |
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --include-all-branches --private
-        echo ${{ inputs.staff_in_charge }} | sed 's/:/ /g' | while read -ra values; do for value in "${values[@]}"; do gh api repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/invitations -f role=admin -f email=$value; done; done
+        echo ${{ inputs.staff_in_charge }} | sed 's/:/ /g' | while read -ra values; do for value in "${values[@]}"; do gh api repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/collaborators/$value -f permission=admin ; done; done
       env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
