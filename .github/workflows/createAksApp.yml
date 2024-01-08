@@ -6,6 +6,18 @@ on:
       appname:
         description: Application Name
         required: true
+      faculty_in_charge:
+        description: Input Faculty owners' emails (seperate with ":")
+        required: true
+      staff_in_charge:
+        description: Input Technical owners' emails (seperate with ":")
+        required: true
+      department:
+        description: input the department code which own the website
+        required: true
+      url:
+        description: Input site domain name (e.g. abc.hkust.edu.hk)
+        required: true
       pvc:
         description: Persistent Volume size (default, 1Gi)
         required: true
@@ -140,45 +152,47 @@ jobs:
         admin: false
         use-kubelogin: true
 
-    - name: Register an App
-      run: echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.APP_NAME }} --query "appId" --output tsv)" >> $GITHUB_ENV
+#    - name: Register an App
+#      run: echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.APP_NAME }} --query "appId" --output tsv)" >> $GITHUB_ENV
 
-    - name: Add App owner
-      run: |
-        az ad app owner add --id ${{ env.AZURE_APP_ID }} --owner-object-id b14a3839-eae6-453b-a37f-0e12ff845aa4
-        echo "AZURE_APP_OBJ=$(az ad app show --id ${{ env.AZURE_APP_ID }} --query "id" --output tsv)" >> $GITHUB_ENV
+#    - name: Add App owner
+#      run: |
+#        az ad app owner add --id ${{ env.AZURE_APP_ID }} --owner-object-id b14a3839-eae6-453b-a37f-0e12ff845aa4
+#        echo "AZURE_APP_OBJ=$(az ad app show --id ${{ env.AZURE_APP_ID }} --query "id" --output tsv)" >> $GITHUB_ENV
 
-    - name: Create Federated Credential
-      run: az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
+#    - name: Create Federated Credential
+#      run: az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
-    - name: Create Service Principal
-      run: echo "AZURE_SP_ID=$(az ad sp create --id ${{ env.AZURE_APP_ID }} --query "id" --output tsv)" >> $GITHUB_ENV
+#    - name: Create Service Principal
+#      run: echo "AZURE_SP_ID=$(az ad sp create --id ${{ env.AZURE_APP_ID }} --query "id" --output tsv)" >> $GITHUB_ENV
 
-    - name: Create ACR repository token
-      run: echo "ACR_TOKEN_PW=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.ACR_REPO }} content/delete content/read content/write metadata/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
+#    - name: Create ACR repository token
+#      run: echo "ACR_TOKEN_PW=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.ACR_REPO }} content/delete content/read content/write metadata/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
 
-    - name: Create AKS namespace, apply resource quota, network policy and PVC
-      run: |
-        kubectl create namespace ${{ env.APP_NAME }}
-        kubectl apply -f ./NetworkPolicy.yaml -f ./ResourceQuota.yaml -f ./PersistentVolumeClaim.yaml -n ${{ env.APP_NAME }}
-        az role assignment create --role "Azure Kubernetes Service Cluster User Role" --assignee ${{ env.AZURE_APP_ID }} --scope /subscriptions/8fec5943-6772-4aa8-a1aa-59ef7483fd2b/resourcegroups/rg-dev-eas-aks-01/providers/Microsoft.ContainerService/managedClusters/aks-zup2kwh4fwbse
-        az role assignment create --role "Azure Kubernetes Service RBAC Writer" --assignee ${{ env.AZURE_APP_ID }} --scope /subscriptions/8fec5943-6772-4aa8-a1aa-59ef7483fd2b/resourcegroups/rg-dev-eas-aks-01/providers/Microsoft.ContainerService/managedClusters/aks-zup2kwh4fwbse/namespaces/${{ env.APP_NAME }}
-        sleep 5
-        echo "AKS_PVC=$(kubectl get pvc ${{ env.APP_NAME }}-pvc -o=custom-columns="volume:.spec.volumeName" --no-headers -n ${{ env.APP_NAME }})" >> $GITHUB_ENV
+#    - name: Create AKS namespace, apply resource quota, network policy and PVC
+#      run: |
+#        kubectl create namespace ${{ env.APP_NAME }}
+#        kubectl apply -f ./NetworkPolicy.yaml -f ./ResourceQuota.yaml -f ./PersistentVolumeClaim.yaml -n ${{ env.APP_NAME }}
+#        az role assignment create --role "Azure Kubernetes Service Cluster User Role" --assignee ${{ env.AZURE_APP_ID }} --scope /subscriptions/8fec5943-6772-4aa8-a1aa-59ef7483fd2b/resourcegroups/rg-dev-eas-aks-01/providers/Microsoft.ContainerService/managedClusters/aks-zup2kwh4fwbse
+#        az role assignment create --role "Azure Kubernetes Service RBAC Writer" --assignee ${{ env.AZURE_APP_ID }} --scope /subscriptions/8fec5943-6772-4aa8-a1aa-59ef7483fd2b/resourcegroups/rg-dev-eas-aks-01/providers/Microsoft.ContainerService/managedClusters/aks-zup2kwh4fwbse/namespaces/${{ env.APP_NAME }}
+#        sleep 5
+#        echo "AKS_PVC=$(kubectl get pvc ${{ env.APP_NAME }}-pvc -o=custom-columns="volume:.spec.volumeName" --no-headers -n ${{ env.APP_NAME }})" >> $GITHUB_ENV
 
 #     comment: use policy to control SAS
 #     az storage share policy create --name ${{ env.APP_NAME }} --share-name ${{ env.AKS_PVC }} --expiry 2047-06-30T16:00:00Z --permissions cdlrw
 #     echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.AKS_PVC }} --policy-name ${{ env.APP_NAME }} --output tsv)" >> $GITHUB_ENV
-    - name: Create file share SAS
-      run: |
-        echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.AKS_PVC }} --expiry 2047-06-30T16:00Z --permissions cdlrw --output tsv)" >> $GITHUB_ENV
-      env:
-        AZURE_STORAGE_KEY: ${{ secrets.AZURE_SA_KEY }}
-        AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_SA }}
+#    - name: Create file share SAS
+#      run: |
+#        echo "AZURE_SA_SAS=$(az storage share generate-sas --name ${{ env.AKS_PVC }} --expiry 2047-06-30T16:00Z --permissions cdlrw --output tsv)" >> $GITHUB_ENV
+#      env:
+#        AZURE_STORAGE_KEY: ${{ secrets.AZURE_SA_KEY }}
+#        AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_SA }}
 
     - name: Create Github repository
       run: |
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --include-all-branches --private
+        echo ${{ inputs.staff_in_charge }} | sed 's/:/ /g' | while read -ra values; do for value in "${values[@]}"; do \
+          gh api repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/invitations -f role=admin -f email=$value; done; done
       env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -228,14 +242,14 @@ jobs:
 #      env:
 #        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - name: Debug
-      run: |
-        cat ./federated-credential.json
-        echo "App name: ${{ env.APP_NAME }}"
-        echo "App ID: ${{ env.AZURE_APP_ID }}, Object ID: ${{ env.AZURE_APP_OBJ }}"
-        echo "SP ID: ${{ env.AZURE_SP_ID }}"
-        echo "PVC name: ${{ env.AKS_PVC }}"
-        echo "File share SAS: ${{ env.AZURE_SA_SAS }}"
-        echo "ACR token (space seperated):"
-        echo ${{ env.ACR_TOKEN_PW }} | sed 's/./& /g'
+#    - name: Debug
+#      run: |
+#        cat ./federated-credential.json
+#        echo "App name: ${{ env.APP_NAME }}"
+#        echo "App ID: ${{ env.AZURE_APP_ID }}, Object ID: ${{ env.AZURE_APP_OBJ }}"
+#        echo "SP ID: ${{ env.AZURE_SP_ID }}"
+#        echo "PVC name: ${{ env.AKS_PVC }}"
+#        echo "File share SAS: ${{ env.AZURE_SA_SAS }}"
+#        echo "ACR token (space seperated):"
+#        echo ${{ env.ACR_TOKEN_PW }} | sed 's/./& /g'
 #        echo "Mysql DB: ${{ env.DB_DATABASE }}, User: ${{ env.DB_USER }}, PW: ${{ env.DB_PASSWORD }}"
