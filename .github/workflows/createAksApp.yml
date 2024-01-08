@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       appname:
-        description: Application Name
+        description: Application Name (e.g. app1)
         required: true
       faculty_in_charge:
         description: Input Faculty owners' emails (seperate with ":")
@@ -16,7 +16,7 @@ on:
         description: input the department code which own the website
         required: true
       url:
-        description: Input site domain name (e.g. abc.hkust.edu.hk)
+        description: Input site domain name (e.g. app1.hkust.edu.hk)
         required: true
       pvc:
         description: Persistent Volume size (default, 1Gi)
@@ -38,25 +38,22 @@ on:
 permissions:
   id-token: write
   contents: read
-#  actions: read
 
 env:
-  APP_NAME: aks-app-${{ inputs.appname }}
-  ACR_REPO: aks-app/${{ inputs.appname }}
+  APP_NAME: aksapp-${{ inputs.appname }}
+  ACR_REPO: aksapp/${{ inputs.appname }}
 
 jobs:
 
   initCheckDev:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
     outputs:
       app_check: ${{ steps.app_check.outputs.status }}
-      ns_check: ${{ steps.ns_check.outputs.status }}
       acrrepo_check: ${{ steps.acrrepo_check.outputs.status }}
       acrtoken_check: ${{ steps.acrtoken_check.outputs.status }}
+      ns_check: ${{ steps.ns_check.outputs.status }}
       githubrepo_check: ${{ steps.githubrepo_check.outputs.status }}
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Azure login OIDC
       uses: azure/login@v1
@@ -82,10 +79,6 @@ jobs:
       id: app_check
       run: echo "status=$(az ad app list --filter "displayname eq '${{ env.APP_NAME }}'" --output tsv | wc -l)" >> $GITHUB_OUTPUT
 
-    - name: Check AKS namespace
-      id: ns_check
-      run: echo "status=$(kubectl get namespace ${{ env.APP_NAME }} --ignore-not-found --no-headers | wc -l)" >> $GITHUB_OUTPUT
-
     - name: Check ACR repository
       id: acrrepo_check
       run: echo "status=$(az acr repository list -n ${{ vars.ACR_REGISTRY }} --query "[?contains(@, '${{ env.ACR_REPO }}')]" --output tsv | wc -l)" >> $GITHUB_OUTPUT
@@ -93,6 +86,10 @@ jobs:
     - name: Check ACR token
       id: acrtoken_check
       run: echo "status=$(az acr token list -r ${{ vars.ACR_REGISTRY }} --query "[?name == '${{ env.APP_NAME }}'].name" --output tsv | wc -l)" >> $GITHUB_OUTPUT
+
+    - name: Check AKS namespace
+      id: ns_check
+      run: echo "status=$(kubectl get namespace ${{ env.APP_NAME }} --ignore-not-found --no-headers | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check Github repository
       id: githubrepo_check
@@ -103,9 +100,9 @@ jobs:
     - name: Display check status
       run: |
         echo "App check: ${{ steps.app_check.outputs.status }}"
-        echo "Namespace check: ${{ steps.ns_check.outputs.status }}"
         echo "ARC repository check: ${{ steps.acrrepo_check.outputs.status }}"
         echo "ACR token check: ${{ steps.acrtoken_check.outputs.status }}"
+        echo "Namespace check: ${{ steps.ns_check.outputs.status }}"
         echo "Github repository check: ${{ steps.githubrepo_check.outputs.status }}"
 
 
@@ -116,13 +113,13 @@ jobs:
     if: |-
       ${{
         needs.initCheckDev.outputs.app_check == '0' &&
+        needs.initCheckDev.outputs.acrtoken_check == '0' &&
+        needs.initCheckDev.outputs.acrtoken_check == '0' &&
         needs.initCheckDev.outputs.ns_check == '0' &&
-        needs.initCheckDev.outputs.acrtoken_check == '0' &&
-        needs.initCheckDev.outputs.acrtoken_check == '0' &&
         needs.initCheckDev.outputs.githubrepo_check == '0'
       }}
     env: 
-      AKS_ENV: dev
+      GH_ENV: dev
 
     steps:
     - name: Checkout the repository
@@ -137,7 +134,7 @@ jobs:
       env:
         APP_NAME: ${{ env.APP_NAME }}
         GH_ORG: ${{ vars.GH_ORG }}
-        GH_BRANCH: ${{ env.AKS_ENV }}
+        GH_BRANCH: ${{ env.GH_ENV }}
         PVC_SIZE: ${{ inputs.pvc }}
 
     - name: Azure login OIDC
@@ -204,23 +201,23 @@ jobs:
 
     - name: Create Github Dev Branch info
       run: |          
-        gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_TOKEN"
-        gh secret set AKS_AGENTPOOL --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_AGENTPOOL"
-        gh secret set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AZURE_CLIENT_ID"
-        gh secret set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AZURE_SUBSCRIPTION_ID"
-        gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AZURE_TENANT_ID"
-        gh secret set DB_PASSWORD --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_PASSWORD"
+        gh secret set ACR_TOKEN --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$ACR_TOKEN"
+        gh secret set AKS_AGENTPOOL --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$AKS_AGENTPOOL"
+        gh secret set AZURE_CLIENT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$AZURE_CLIENT_ID"
+        gh secret set AZURE_SUBSCRIPTION_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$AZURE_SUBSCRIPTION_ID"
+        gh secret set AZURE_TENANT_ID --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$AZURE_TENANT_ID"
+        gh secret set DB_PASSWORD --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$DB_PASSWORD"
 
-        gh variable set ACR_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_USER"
-        gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_REGISTRY"
-        gh variable set ACR_REPO --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$ACR_REPO"
-        gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_CLUSTER"
-        gh variable set AKS_NAMESPACE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_NAMESPACE"
-        gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$AKS_RESOURCE_GROUP"
-        gh variable set APP_NAME --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$APP_NAME"
-        gh variable set DB_DATABASE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_DATABASE"
-        gh variable set DB_HOST --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_HOST"
-        gh variable set DB_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.AKS_ENV }} --body "$DB_USER"
+        gh variable set ACR_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$ACR_USER"
+        gh variable set ACR_REGISTRY --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$ACR_REGISTRY"
+        gh variable set ACR_REPO --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$ACR_REPO"
+        gh variable set AKS_CLUSTER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$AKS_CLUSTER"
+        gh variable set AKS_NAMESPACE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$AKS_NAMESPACE"
+        gh variable set AKS_RESOURCE_GROUP --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$AKS_RESOURCE_GROUP"
+        gh variable set APP_NAME --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$APP_NAME"
+        gh variable set DB_DATABASE --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$DB_DATABASE"
+        gh variable set DB_HOST --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$DB_HOST"
+        gh variable set DB_USER --repo ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --env ${{ env.GH_ENV }} --body "$DB_USER"
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         ACR_TOKEN: ${{ env.ACR_TOKEN_PW }}
