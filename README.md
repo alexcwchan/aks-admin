@@ -8,5 +8,5 @@ This repository is for setup container app infrastructure and deployement to Azu
 - Github repository
     - clone from template repository (sample app and CI/CD workflows)
     - repository secrets and variables
-- <font size="5" style="color: red;">**Post configuration**</font>
+- <span style="color:red;">**Post configuration**</span>
     - <font size="3">from github.com, invite technical owner as repository collaborator with Admin permission (<font style="color: red;">*github cli allow add collaborator by username only*</font>)
