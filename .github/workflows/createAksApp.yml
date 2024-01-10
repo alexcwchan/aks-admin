@@ -249,7 +249,7 @@ jobs:
 
     - name: Add inventory record
       run: |
-        curl -k https://aks-backend.beatricehk.com/addApp/${{ inputs.appname }}?url=${{ inputs.url}}&faculty_in_charge=${{ inputs.faculty_in_charge }}&staff_in_charge=${{ inputs.staff_in_charge }}&department=${{ inputs.department }}&password=${{ env.ACR_TOKEN_PW }}
+        curl -k 'https://aks-backend.beatricehk.com/addApp/${{ inputs.appname }}?url=${{ inputs.url}}&faculty_in_charge=${{ inputs.faculty_in_charge }}&staff_in_charge=${{ inputs.staff_in_charge }}&department=${{ inputs.department }}&password=${{ env.ACR_TOKEN_PW }}'
 
 
     - name: Debug
