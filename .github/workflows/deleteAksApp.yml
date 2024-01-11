@@ -1,0 +1,116 @@
+name: Delete AKS App
+
+on:
+  workflow_dispatch:
+    inputs:
+      appname:
+        description: Application Name (e.g. app1)
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  APP_NAME: aksapp-${{ inputs.appname }}
+  ACR_REPO: aksapp/${{ inputs.appname }}
+
+jobs:
+
+  initCheckDev:
+    runs-on: ubuntu-latest
+    outputs:
+      app_check: ${{ steps.app_check.outputs.status }}
+      sp check: ${{ steps.sp_check.outputs.status }}
+      acrrepo_check: ${{ steps.acrrepo_check.outputs.status }}
+      acrtoken_check: ${{ steps.acrtoken_check.outputs.status }}
+      acrscope_check: ${{ steps.acrscope_check.outputs.status }}
+      ns_check: ${{ steps.ns_check.outputs.status }}
+      githubrepo_check: ${{ steps.githubrepo_check.outputs.status }}
+
+    steps:
+    - name: Azure login OIDC
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: kubelogin with AKS
+      uses: azure/use-kubelogin@v1
+      with:
+        kubelogin-version: 'v0.0.34'
+
+    - name: Set AKS context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ vars.AKS_RESOURCE_GROUP }}
+        cluster-name: ${{ vars.AKS_CLUSTER }}
+        admin: false
+        use-kubelogin: true
+
+    - name: Check Azure App
+      id: app_check
+      run: echo "status=$(az ad app list --filter "displayname eq '${{ env.APP_NAME }}'" --query [].appId -o tsv)" >> $GITHUB_OUTPUT
+
+    - name: Check Azure SP
+      id: sp_check
+      run: echo "status=$(az ad sp show --id ${{ steps.app_check.outputs.status }} --query id -o tsv)" >> $GITHUB_OUTPUT
+
+    - name: Check ACR repository
+      id: acrrepo_check
+      run: echo "status=$(az acr repository show -n ${{ vars.ACR_REGISTRY }} --repository ${{ env.ACR_REPO }} -o tsv | wc -l)" >> $GITHUB_OUTPUT
+
+    - name: Check ACR token
+      id: acrtoken_check
+      run: echo "status=$(az acr token show -r ${{ vars.ACR_REGISTRY }} -n ${{ env.APP_NAME }} -o tsv | wc -l)" >> $GITHUB_OUTPUT
+
+    - name: Check ACR scope map
+      id: acrscope_check
+      run: echo "status=$(az acr scope-map show -r ${{ vars.ACR_REGISTRY }} -n ${{ env.APP_NAME }}-scope-map -o tsv | wc -l)" >> $GITHUB_OUTPUT
+
+    - name: Check AKS namespace
+      id: ns_check
+      run: echo "status=$(kubectl get namespace ${{ env.APP_NAME }} --ignore-not-found --no-headers | wc -l)" >> $GITHUB_OUTPUT
+
+    - name: Check Github repository
+      id: githubrepo_check
+      run: echo "status=$(gh repo list ${{ vars.GH_ORG }} --json name | grep '\"${{ env.APP_NAME }}\"' | wc -l)" >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    - name: Display check status
+      run: |
+        echo "App check: ${{ steps.app_check.outputs.status }}"
+        echo "SP check: ${{ steps.sp_check.outputs.status }}"
+        echo "ARC repository check: ${{ steps.acrrepo_check.outputs.status }}"
+        echo "ACR token check: ${{ steps.acrtoken_check.outputs.status }}"
+        echo "ACR scope map check: ${{ steps.acrscope_check.outputs.status }}"
+        echo "Namespace check: ${{ steps.ns_check.outputs.status }}"
+        echo "Github repository check: ${{ steps.githubrepo_check.outputs.status }}"
+
+
+
+
+
+
+#  initCheck:
+#    # The type of runner that the job will run on
+#    runs-on: ubuntu-latest
+#
+#    # Steps represent a sequence of tasks that will be executed as part of the job
+#    steps:
+#    - name: Azure login OIDC
+#      uses: azure/login@v1
+#      with:
+#        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+#        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+#        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+#    - name: Check Azure App
+#      id: app_check
+#      run: echo "status=$(az ad sp delete  --id ${{ inputs.spname }} --output tsv)" >> $GITHUB_OUTPUT
+
+#    - name: Display check status
+#      run: |
+#        echo "App check: ${{ steps.app_check.outputs.status }}"
