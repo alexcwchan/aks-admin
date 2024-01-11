@@ -79,8 +79,10 @@ jobs:
       }}
     outputs:
       app_check: ${{ steps.app_check.outputs.status }}
+      sp check: ${{ steps.sp_check.outputs.status }}
       acrrepo_check: ${{ steps.acrrepo_check.outputs.status }}
       acrtoken_check: ${{ steps.acrtoken_check.outputs.status }}
+      acrscope_check: ${{ steps.acrscope_check.outputs.status }}
       ns_check: ${{ steps.ns_check.outputs.status }}
       githubrepo_check: ${{ steps.githubrepo_check.outputs.status }}
 
@@ -107,15 +109,23 @@ jobs:
 
     - name: Check Azure App
       id: app_check
-      run: echo "status=$(az ad app list --filter "displayname eq '${{ env.APP_NAME }}'" --output tsv | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(az ad app list --filter "displayname eq '${{ env.APP_NAME }}'" -o tsv | wc -l)" >> $GITHUB_OUTPUT
+
+    - name: Check Azure SP
+      id: sp_check
+      run: echo "status=$(az ad sp list --display-name '${{ env.APP_NAME }}' -o tsv | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check ACR repository
       id: acrrepo_check
-      run: echo "status=$(az acr repository list -n ${{ vars.ACR_REGISTRY }} --query "[?contains(@, '${{ env.ACR_REPO }}')]" --output tsv | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(az acr repository list -n ${{ vars.ACR_REGISTRY }} --query "[?contains(@, '${{ env.ACR_REPO }}')]" -o tsv | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check ACR token
       id: acrtoken_check
-      run: echo "status=$(az acr token list -r ${{ vars.ACR_REGISTRY }} --query "[?name == '${{ env.APP_NAME }}'].name" --output tsv | wc -l)" >> $GITHUB_OUTPUT
+      run: echo "status=$(az acr token show -r ${{ vars.ACR_REGISTRY }} -n ${{ env.APP_NAME }} -o tsv | wc -l)" >> $GITHUB_OUTPUT
+
+    - name: Check ACR scope map
+      id: acrscope_check
+      run: echo "status=$(az acr scope-map show -r ${{ vars.ACR_REGISTRY }} -n ${{ env.APP_NAME }}-scope-map -o tsv | wc -l)" >> $GITHUB_OUTPUT
 
     - name: Check AKS namespace
       id: ns_check
@@ -130,8 +140,10 @@ jobs:
     - name: Display check status
       run: |
         echo "App check: ${{ steps.app_check.outputs.status }}"
+        echo "SP check: ${{ steps.sp_check.outputs.status }}"
         echo "ARC repository check: ${{ steps.acrrepo_check.outputs.status }}"
         echo "ACR token check: ${{ steps.acrtoken_check.outputs.status }}"
+        echo "ACR scope map check: ${{ steps.acrscope_check.outputs.status }}"
         echo "Namespace check: ${{ steps.ns_check.outputs.status }}"
         echo "Github repository check: ${{ steps.githubrepo_check.outputs.status }}"
 
@@ -143,8 +155,10 @@ jobs:
     if: |-
       ${{
         needs.initCheckDev.outputs.app_check == '0' &&
+        needs.initCheckDev.outputs.sp check == '0' &&
         needs.initCheckDev.outputs.acrtoken_check == '0' &&
         needs.initCheckDev.outputs.acrtoken_check == '0' &&
+        needs.initCheckDev.outputs.acrscope_check == '0' &&
         needs.initCheckDev.outputs.ns_check == '0' &&
         needs.initCheckDev.outputs.githubrepo_check == '0'
       }}
