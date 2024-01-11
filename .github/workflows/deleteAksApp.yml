@@ -105,9 +105,6 @@ jobs:
       }}
 
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v4
-
     - name: Azure login OIDC
       uses: azure/login@v1
       with:
@@ -129,16 +126,16 @@ jobs:
         use-kubelogin: true
 
     - name: Delete Azure SP
-      run: echo "AZURE_SP=$(az ad sp delete --id ${{ needs.initCheckDev.outputs.sp_check }} -o tsv)" >> $GITHUB_ENV
+      run: az ad sp delete --id ${{ needs.initCheckDev.outputs.sp_check }} -o tsv
 
     - name: Delete Azure App
-      run: echo "AZURE_APP=$(az ad app delete --id ${{ needs.initCheckDev.outputs.app_check }} -o tsv)" >> $GITHUB_ENV
+      run: az ad app delete --id ${{ needs.initCheckDev.outputs.app_check }} -o tsv
 
     - name: Delete ACR token
-      run: echo "ACR_TOKEN=$(az acr token delete -n ${{ env.APP_NAME }} -r ${{ vars.ACR_REGISTRY }} -o tsv)" >> $GITHUB_ENV
+      run: az acr token delete -n ${{ env.APP_NAME }} -r ${{ vars.ACR_REGISTRY }} -y -o tsv)
 
     - name: Delete ACR scope map
-      run: echo "ACR_SCOPEMAP=$(az acr scope-map delete -n ${{ env.APP_NAME }}-scope-map -r ${{ vars.ACR_REGISTRY }} -o tsv)" >> $GITHUB_ENV
+      run: az acr scope-map delete -n ${{ env.APP_NAME }}-scope-map -r ${{ vars.ACR_REGISTRY }} -y -o tsv
 
     - name: Delete AKS namespace
       run: |
@@ -153,10 +150,3 @@ jobs:
 #    - name: Add inventory record
 #      run: |
 #        curl -k 'https://aks-backend.beatricehk.com/addApp/${{ inputs.appname }}?url=${{ inputs.url}}&faculty_in_charge=${{ inputs.faculty_in_charge }}&staff_in_charge=${{ inputs.staff_in_charge }}&department=${{ inputs.department }}&password=${{ env.ACR_TOKEN_PW }}'
-
-    - name: Debug
-      run: |
-        echo "App status: ${{ env.AZURE_APP }}"
-        echo "SP status: ${{ env.AZURE_SP }}"
-        echo "ACR token status ${{ env.ACR_TOKEN }}"
-        echo "ACR scope map status: ${{ env.ACR_SCOPEMAP }}"
