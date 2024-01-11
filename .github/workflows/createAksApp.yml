@@ -29,22 +29,15 @@ on:
           - 3
           - 4
           - 5
-      needdev:
-        description: Need Dev (default, no)
+      needenv:
+        description: Required Environment (default, Prod only)
         type: choice
         required: true
-        default: 'false'
+        default: 'Prod'
         options:
-          - false
-          - true
-      needuat:
-        description: Need UAT (default, no)
-        type: choice
-        required: true
-        default: 'false'
-        options:
-          - false
-          - true
+          - Prod
+          - Prod-Dev
+          - Prod-Uat-Dev
       agentpooldev:
         description: Assigned AKS Dev NodePool
         type: choice
@@ -79,7 +72,11 @@ jobs:
 
   initCheckDev:
     runs-on: ubuntu-latest
-    if: ${{ inputs.needdev == 'true' }}
+    if: |-
+      ${{
+        inputs.needenv == 'Prod-Dev' &&
+        inputs.needenv == 'Prod-Uat-Dev'
+      }}
     outputs:
       app_check: ${{ steps.app_check.outputs.status }}
       acrrepo_check: ${{ steps.acrrepo_check.outputs.status }}
