@@ -132,7 +132,7 @@ jobs:
       run: az ad app delete --id ${{ needs.initCheckDev.outputs.app_check }} -o tsv
 
     - name: Delete ACR token
-      run: az acr token delete -n ${{ env.APP_NAME }} -r ${{ vars.ACR_REGISTRY }} -y -o tsv)
+      run: az acr token delete -n ${{ env.APP_NAME }} -r ${{ vars.ACR_REGISTRY }} -y -o tsv
 
     - name: Delete ACR scope map
       run: az acr scope-map delete -n ${{ env.APP_NAME }}-scope-map -r ${{ vars.ACR_REGISTRY }} -y -o tsv
