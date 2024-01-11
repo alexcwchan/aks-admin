@@ -155,7 +155,7 @@ jobs:
     if: |-
       ${{
         needs.initCheckDev.outputs.app_check == '0' &&
-        needs.initCheckDev.outputs.sp check == '0' &&
+        needs.initCheckDev.outputs.sp_check == '0' &&
         needs.initCheckDev.outputs.acrtoken_check == '0' &&
         needs.initCheckDev.outputs.acrtoken_check == '0' &&
         needs.initCheckDev.outputs.acrscope_check == '0' &&
