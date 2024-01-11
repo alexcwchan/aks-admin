@@ -201,7 +201,7 @@ jobs:
         admin: false
         use-kubelogin: true
 
-    - name: Register an App
+    - name: Register Azure App
       run: echo "AZURE_APP_ID=$(az ad app create --display-name ${{ env.APP_NAME }} --query "appId" --output tsv)" >> $GITHUB_ENV
 
     - name: Add App owner
@@ -212,10 +212,10 @@ jobs:
     - name: Create Federated Credential
       run: az ad app federated-credential create --id ${{ env.AZURE_APP_ID }} --parameters federated-credential.json
 
-    - name: Create Service Principal
+    - name: Create Azure SP
       run: echo "AZURE_SP_ID=$(az ad sp create --id ${{ env.AZURE_APP_ID }} --query "id" --output tsv)" >> $GITHUB_ENV
 
-    - name: Create ACR repository token
+    - name: Create ACR token
       run: echo "ACR_TOKEN_PW=$(az acr token create --name "${{ env.APP_NAME }}" --registry ${{ vars.ACR_REGISTRY }} --repository ${{ env.ACR_REPO }} content/delete content/read content/write metadata/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" --output tsv)" >> $GITHUB_ENV
 
     - name: Create AKS namespace, apply resource quota, network policy and PVC
