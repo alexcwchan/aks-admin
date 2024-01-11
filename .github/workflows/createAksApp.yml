@@ -20,20 +20,52 @@ on:
         required: true
       pvc:
         description: Persistent Volume size (default, 1Gi)
+        type: choice
         required: true
-        default: 1
+        default: '1'
+        options:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+      needdev:
+        description: Need Dev (default, no)
+        type: choice
+        required: true
+        default: 'false'
+        options:
+          - false
+          - true
+      needuat:
+        description: Need UAT (default, no)
+        type: choice
+        required: true
+        default: 'false'
+        options:
+          - false
+          - true
       agentpooldev:
         description: Assigned AKS Dev NodePool
+        type: choice
         required: true
         default: npuser01
+        options:
+          - npuser01
       agentpooluat:
         description: Assigned AKS UAT NodePool
+        type: choice
         required: true
         default: npuser01
+        options:
+          - npuser01
       agentpoolprod:
         description: Assigned AKS Prod NodePool
+        type: choice
         required: true
         default: npuser01
+        options:
+          - npuser01
 
 permissions:
   id-token: write
@@ -47,6 +79,7 @@ jobs:
 
   initCheckDev:
     runs-on: ubuntu-latest
+    if: ${{ inputs.needdev == 'true' }}
     outputs:
       app_check: ${{ steps.app_check.outputs.status }}
       acrrepo_check: ${{ steps.acrrepo_check.outputs.status }}
