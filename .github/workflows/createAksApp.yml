@@ -334,8 +334,8 @@ jobs:
       run: |
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} -p ${{ vars.GH_ORG }}/aks_template --public
         sleep 5
-        echo gh api -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/commits?per_page=1
-        echo gh api -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/commits?per_page=1) | jq -r .[].sha
+        gh api -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/commits?per_page=1
+        gh api -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/commits?per_page=1 | jq -r .[].sha
         echo "GH_COMMIT_SHA=$(gh api -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/commits?per_page=1) | jq -r .[].sha" >> $GITHUB_ENV
         echo ${{ env.GH_COMMIT_SHA }}
         echo $GH_COMMIT_SHA
