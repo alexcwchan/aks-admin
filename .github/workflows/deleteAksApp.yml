@@ -144,7 +144,7 @@ jobs:
       run: az acr scope-map delete -n ${{ env.APP_NAME }}-scope-map -r ${{ vars.ACR_REGISTRY }} -y -o tsv
 
     - name: Delete ACR repository
-      run: az acr repository delete -n ${{ env.ACR_REPO }} --repository ${{ vars.ACR_REGISTRY }}
+      run: az acr repository delete -n ${{ vars.ACR_REGISTRY }} --repository ${{ env.ACR_REPO }}
 
     - name: Delete Azure SP
       run: az ad sp delete --id ${{ needs.initCheckDev.outputs.sp_check }} -o tsv
