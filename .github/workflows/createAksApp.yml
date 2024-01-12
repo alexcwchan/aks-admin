@@ -240,7 +240,7 @@ jobs:
       # Temporary change to public repo to test enviornment feature
     - name: Create Github repository
       run: |
-        gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --template ${{ vars.GH_ORG }}/aks_template --include-all-branches --public
+        gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} -p ${{ vars.GH_ORG }}/aks_template --include-all-branches --public
         gh api --method PUT -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/environments/${{ env.GH_ENV }}
       env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
