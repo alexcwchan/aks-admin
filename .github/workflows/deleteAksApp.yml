@@ -125,11 +125,17 @@ jobs:
         admin: false
         use-kubelogin: true
 
-    - name: Delete Azure SP
-      run: az ad sp delete --id ${{ needs.initCheckDev.outputs.sp_check }} -o tsv
+    - name: Delete Github repository
+      run: |
+        gh repo delete ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --yes
+      env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - name: Delete Azure App
-      run: az ad app delete --id ${{ needs.initCheckDev.outputs.app_check }} -o tsv
+    - name: Delete role assignment and AKS namespace
+      run: |
+        az role assignment delete --role "Azure Kubernetes Service Cluster User Role" --assignee ${{ needs.initCheckDev.outputs.app_check }} --scope /subscriptions/8fec5943-6772-4aa8-a1aa-59ef7483fd2b/resourcegroups/rg-dev-eas-aks-01/providers/Microsoft.ContainerService/managedClusters/aks-zup2kwh4fwbse
+        az role assignment delete --role "Azure Kubernetes Service RBAC Writer" --assignee ${{ needs.initCheckDev.outputs.app_check }} --scope /subscriptions/8fec5943-6772-4aa8-a1aa-59ef7483fd2b/resourcegroups/rg-dev-eas-aks-01/providers/Microsoft.ContainerService/managedClusters/aks-zup2kwh4fwbse/namespaces/${{ env.APP_NAME }}
+        kubectl delete namespace ${{ env.APP_NAME }}
 
     - name: Delete ACR token
       run: az acr token delete -n ${{ env.APP_NAME }} -r ${{ vars.ACR_REGISTRY }} -y -o tsv
@@ -137,15 +143,11 @@ jobs:
     - name: Delete ACR scope map
       run: az acr scope-map delete -n ${{ env.APP_NAME }}-scope-map -r ${{ vars.ACR_REGISTRY }} -y -o tsv
 
-    - name: Delete AKS namespace
-      run: |
-        kubectl delete namespace ${{ env.APP_NAME }}
+    - name: Delete Azure SP
+      run: az ad sp delete --id ${{ needs.initCheckDev.outputs.sp_check }} -o tsv
 
-    - name: Create Github repository
-      run: |
-        gh repo delete ${{ vars.GH_ORG }}/${{ env.APP_NAME }} --yes
-      env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Delete Azure App
+      run: az ad app delete --id ${{ needs.initCheckDev.outputs.app_check }} -o tsv
 
 #    - name: Add inventory record
 #      run: |

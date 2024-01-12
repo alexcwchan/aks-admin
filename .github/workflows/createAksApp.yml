@@ -218,7 +218,7 @@ jobs:
     - name: Create ACR token
       run: echo "ACR_TOKEN_PW=$(az acr token create -n "${{ env.APP_NAME }}" -r ${{ vars.ACR_REGISTRY }} --repository ${{ env.ACR_REPO }} content/delete content/read content/write metadata/read --only-show-errors --query "credentials.passwords[?name=='password1'].value" -o tsv)" >> $GITHUB_ENV
 
-    - name: Create AKS namespace, apply resource quota, network policy and PVC
+    - name: Create AKS namespace, role assignment, apply resource quota, network policy and PVC
       run: |
         kubectl create namespace ${{ env.APP_NAME }}
         kubectl apply -f ./NetworkPolicy.yaml -f ./ResourceQuota.yaml -f ./PersistentVolumeClaim.yaml -n ${{ env.APP_NAME }}
