@@ -334,6 +334,7 @@ jobs:
       run: |
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} -p ${{ vars.GH_ORG }}/aks_template --public
         sleep 5
+        echo "GH_COMMIT_SHA=$(gh api -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/commits/dev)"
         gh api --method POST -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/git/refs -f ref='refs/heads/prod' -f sha='0584b3f4441acdcd8032668c368356d4a1245272'
         gh api --method PUT -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/environments/${{ env.GH_ENV }}
       env:
