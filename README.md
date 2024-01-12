@@ -2,14 +2,14 @@
 This repository is intended for setup container app infrastructure and deployement to Azure .  The setup includes the following:
 - Azure resources for PROD (optional: DEV and UAT)
     - Application, corresponding service principal and federation credential to Github repository
-    - ACR token and scope map
+    - ACR scope map and token
     - AKS namespace, resources quota, network policy and PVC
     - Storage account file share SAS
 - Github repository
     - clone from template repository (sample app and CI/CD workflows)
     - define repository secrets and variables
 ## *Configuration*
-To enable all workflows, it is necessary to register an Azure Application with all the required permissions.  The following steps nned to be followed:
+To enable all workflows, it is necessary to register an Azure Application with all the required permissions.  The following steps need to be followed:
 - Register an Azure application
     - create an API application permission of "Application.Read.All" and "Application.ReadWrite.OwnedBy"
     - create a federation credential to this repository
@@ -24,7 +24,7 @@ To enable all workflows, it is necessary to register an Azure Application with a
     - generate GitHub personal access token
     - update actions secrets and variables
 
-|permission|description|
+|ACR Permission|Description|
 |---|---|
 |Microsoft.ContainerRegistry/registries/generateCredentials/action|Generate keys for a token of a specified container registry|
 |Microsoft.ContainerRegistry/registries/pull/read|Pull or Get images from a container registry|
