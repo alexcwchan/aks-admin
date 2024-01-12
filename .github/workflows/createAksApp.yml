@@ -136,12 +136,12 @@ jobs:
     - name: export check status
       id: check_status
       run: |-
-        if [ steps.app_check.outputs.status == "0" ] &&
-           [ steps.sp_check.outputs.status == "0" ] &&
-           [ steps.acrrepo_check.outputs.status == "0" ] &&
-           [ steps.acrtoken_check.outputs.status == "0" ] &&
-           [ steps.acrscope_check.outputs.status == "0" ] &&
-           [ steps.ns_check.outputs.status == "0" ] &&
+        if [ steps.app_check.outputs.status == "0" ] && \
+           [ steps.sp_check.outputs.status == "0" ] && \
+           [ steps.acrrepo_check.outputs.status == "0" ] && \
+           [ steps.acrtoken_check.outputs.status == "0" ] && \
+           [ steps.acrscope_check.outputs.status == "0" ] && \
+           [ steps.ns_check.outputs.status == "0" ] && \
            [ steps.githubrepo_check.outputs.status == "0"]
         then
           echo "status="0" >> $GITHUB_OUTPUT
