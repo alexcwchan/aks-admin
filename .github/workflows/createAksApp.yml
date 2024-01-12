@@ -328,12 +328,12 @@ jobs:
         AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_SA }}
 
       # Temporary change to public repo to test enviornment feature
+#        gh api --method DELETE -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/git/refs/heads/uat
+#        gh api --method DELETE -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/git/refs/heads/dev
     - name: Create Github repository
       run: |
         gh repo create ${{ vars.GH_ORG }}/${{ env.APP_NAME }} -p ${{ vars.GH_ORG }}/aks_template --include-all-branches --public
         sleep 5
-#        gh api --method DELETE -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/git/refs/heads/uat
-#        gh api --method DELETE -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/git/refs/heads/dev
         gh api --method PUT -H "Accept: application/vnd.github+json" repos/${{ vars.GH_ORG }}/${{ env.APP_NAME }}/environments/${{ env.GH_ENV }}
       env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
