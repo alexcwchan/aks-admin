@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       appname:
-        description: Application Name (e.g. app1)
+        description: Application Name (e.g. app1, lower case alphanumeric characters or '-')
         required: true
       faculty_in_charge:
         description: Input Faculty owners' emails (seperate with ":")
