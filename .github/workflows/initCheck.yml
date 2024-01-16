@@ -73,22 +73,22 @@ jobs:
       id: check_status
       run: |-
         echo "status=$(
-        ${{ inputs.app_check == '0' &&
-            inputs.sp_check == '0' &&
-            inputs.acrrepo_check == '0' &&
-            inputs.acrtoken_check == '0' &&
-            inputs.acrscope_check == '0' &&
-            inputs.ns_check == '0' &&
-            inputs.githubrepo_check == '0'
+        ${{ env.app_check == '0' &&
+            env.sp_check == '0' &&
+            env.acrrepo_check == '0' &&
+            env.acrtoken_check == '0' &&
+            env.acrscope_check == '0' &&
+            env.ns_check == '0' &&
+            env.githubrepo_check == '0'
         }})" >> $GITHUB_OUTPUT
 
     - name: Display check status
       run: |
-        echo "App check: ${{ inputs.app_check }}"
-        echo "SP check: ${{ inputs.sp_check }}"
-        echo "ARC repository check: ${{ inputs.acrrepo_check }}"
-        echo "ACR token check: ${{ inputs.acrtoken_check }}"
-        echo "ACR scope map check: ${{ inputs.acrscope_check }}"
-        echo "Namespace check: ${{ inputs.ns_check }}"
-        echo "Github repository check: ${{ inputs.githubrepo_check }}"
-        echo "Overall check: ${{ steps.check_status.output.status }}"
+        echo "App check: ${{ env.app_check }}"
+        echo "SP check: ${{ env.sp_check }}"
+        echo "ARC repository check: ${{ env.acrrepo_check }}"
+        echo "ACR token check: ${{ env.acrtoken_check }}"
+        echo "ACR scope map check: ${{ env.acrscope_check }}"
+        echo "Namespace check: ${{ env.ns_check }}"
+        echo "Github repository check: ${{ env.githubrepo_check }}"
+        echo "Overall check: ${{ steps.check_status.outputs.status }}"
