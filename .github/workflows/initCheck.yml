@@ -72,7 +72,7 @@ jobs:
     - name: export check status
       id: check_status
       run: |-
-        echo "status='
+        echo "status=$(
         ${{ inputs.app_check == '0' &&
             inputs.sp_check == '0' &&
             inputs.acrrepo_check == '0' &&
@@ -80,7 +80,7 @@ jobs:
             inputs.acrscope_check == '0' &&
             inputs.ns_check == '0' &&
             inputs.githubrepo_check == '0'
-        }}'" >> $GITHUB_OUTPUT
+        }})" >> $GITHUB_OUTPUT
 
     - name: Display check status
       run: |
