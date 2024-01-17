@@ -2,6 +2,10 @@ name: Test reusable workflow
 
 on:
   workflow_dispatch:
+    inputs:
+      appname:
+        description: Application Name (e.g. app1, lower case alphanumeric characters or '-')
+        required: true
 
 permissions:
   id-token: write
@@ -17,8 +21,8 @@ jobs:
     uses: ./.github/workflows/initCheck.yml
     with:
       appenv: prod
-      appname: aksapp-forthappprod
-      acrrepo: aksapp/forthappprod
+      appname: ${{ env.APP_NAME }}
+      acrrepo: $${{ env.ACR_REPO }}
       AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
       ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
       AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
