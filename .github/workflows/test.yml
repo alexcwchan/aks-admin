@@ -22,7 +22,7 @@ jobs:
     with:
       appenv: prod
       appname: ${{ env.APP_NAME }}
-      acrrepo: $${{ env.ACR_REPO }}
+      acrrepo: ${{ env.ACR_REPO }}
       AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
       ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
       AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
