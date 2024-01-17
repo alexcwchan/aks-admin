@@ -18,4 +18,13 @@ jobs:
     with:
       appenv: prod
       appname: aksapp-forthappprod
-      acrrepo: aksapp/forthappprod      
+      acrrepo: aksapp/forthappprod
+      AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
+      ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+      AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
+      GH_ORG: ${{ vars.GH_ORG }}
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
