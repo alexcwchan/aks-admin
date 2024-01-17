@@ -15,7 +15,7 @@ jobs:
   deploy_prod:
     name: Deploy to Prod
     needs: deploy_dev
-    uses: ./reusable-workflows-env-secrets/.github/workflows/reusable-deploy.yml
+    uses: ./.github/workflows/reusable-deploy.yml
     with:
       environment: prod
     secrets:
