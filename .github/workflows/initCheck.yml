@@ -72,15 +72,18 @@ jobs:
     - name: export check status
       id: check_status
       run: |-
-        echo "status='$(
-        [ ${{ env.app_check }} == '0' ] &&
-        [ ${{ env.sp_check }} == '0' ] &&
-        [ ${{ env.acrrepo_check }} == '0' ] &&
-        [ ${{ env.acrtoken_check }} == '0' ] &&
-        [ ${{ env.acrscope_check }} == '0' ] &&
-        [ ${{ env.ns_check }} == '0' ] &&
-        [ ${{ env.githubrepo_check }} == '0' ]
-        )'" >> $GITHUB_OUTPUT
+        if [ ${{ env.app_check }} == '0' ] && \
+           [ ${{ env.sp_check }} == '0' ] && \
+           [ ${{ env.acrrepo_check }} == '0' ] && \
+           [ ${{ env.acrtoken_check }} == '0' ] && \
+           [ ${{ env.acrscope_check }} == '0' ] && \
+           [ ${{ env.ns_check }} == '0' ] && \
+           [ ${{ env.githubrepo_check }} == '0' ]
+        then
+          echo "status=0" >> $GITHUB_OUTPUT
+        else
+          echo "status=1" >> $GITHUB_OUTPUT
+        fi
 
     - name: Display check status
       run: |
