@@ -33,4 +33,4 @@ jobs:
     runs-on: Ubuntu-latest
     needs: initCheckProd
     steps:
-      - run: echo ${{ needs.initCheckProd.outputs. }}
+      - run: echo ${{ needs.initCheckProd.outputs.initCheck_status }}
