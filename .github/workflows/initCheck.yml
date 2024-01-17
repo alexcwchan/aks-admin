@@ -15,13 +15,13 @@ on:
         description: ACR Repository Name
         type: string
         required: true
-      AKS_RESOURCE_GROUP:
-        type: string
-        required: true
       AKS_CLUSTER:
         type: string
         required: true
       ACR_REGISTRY:
+        type: string
+        required: true
+      AKS_RESOURCE_GROUP:
         type: string
         required: true
       GH_ORG:
