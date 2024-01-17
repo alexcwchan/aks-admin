@@ -17,12 +17,22 @@ env:
 
 jobs:
 
+  get-env-vars:
+    name: Get Environment vars as output
+    runs-on: Ubuntu-latest
+    outputs:
+      APP_NAME: ${{ env.APP_NAME }}
+      ACR_REPO: ${{ env.ACR_REPO }}
+    steps:
+      - run: echo ''
+
   initCheckProd:
+    needs: get-env-vars
     uses: ./.github/workflows/initCheck.yml
     with:
       appenv: prod
-      appname: ${{ env.APP_NAME }}
-      acrrepo: ${{ env.ACR_REPO }}
+      appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
+      acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
       AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
       ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
       AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
