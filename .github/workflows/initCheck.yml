@@ -1,17 +1,25 @@
-name: Init Check Reusable Workflow
+name: Creation init check reusable workflow
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       appenv:
         description: Environment
+        type: string
         required: true
       appname:
         description: Application Name
+        type: string
         required: true
       acrrepo:
         description: ACR Repository Name
+        type: string
         required: true
+
+    outputs:
+      initCheck_status:
+        description: Check result
+        value: ${{ jobs.initCheck.outputs.initCheck_status }}
 
 permissions:
   id-token: write
