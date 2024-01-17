@@ -16,4 +16,6 @@ jobs:
   initCheckProd:
     uses: ./.github/workflows/initCheck.yml
     with:
-      
+      appenv: prod
+      appname: aksapp-forthappprod
+      acrrepo: aksapp/forthappprod      
