@@ -84,8 +84,8 @@ jobs:
     uses: ./.github/workflows/createCheck-template.yml
     with:
       appenv: prod
-      appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
-      acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
+      appname: ${{ needs.input-to-output.outputs.APP_NAME }}
+      acrrepo: ${{ needs.input-to-output.outputs.ACR_REPO }}
     secrets: inherit
 
   initCheckDev:
