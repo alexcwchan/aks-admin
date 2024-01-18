@@ -15,18 +15,6 @@ on:
         description: ACR Repository Name
         type: string
         required: true
-      AKS_CLUSTER:
-        type: string
-        required: true
-      ACR_REGISTRY:
-        type: string
-        required: true
-      AKS_RESOURCE_GROUP:
-        type: string
-        required: true
-      GH_ORG:
-        type: string
-        required: true
 
     secrets:
       AZURE_CLIENT_ID:
@@ -36,6 +24,14 @@ on:
       AZURE_TENANT_ID:
         required: true
       GH_TOKEN:
+        required: true
+      AKS_CLUSTER:
+        required: true
+      ACR_REGISTRY:
+        required: true
+      AKS_RESOURCE_GROUP:
+        required: true
+      GH_ORG:
         required: true
 
     outputs:
@@ -51,7 +47,7 @@ jobs:
 
   initCheck:
     runs-on: ubuntu-latest
-    #environment: ${{ inputs.appenv }}
+    environment: ${{ inputs.appenv }}
     outputs:
       initCheck_status: ${{ steps.check_status.outputs.status }}
 
@@ -71,8 +67,8 @@ jobs:
     - name: Set AKS context
       uses: azure/aks-set-context@v3
       with:
-        resource-group: ${{ inputs.AKS_RESOURCE_GROUP }}
-        cluster-name: ${{ inputs.AKS_CLUSTER }}
+        resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+        cluster-name: ${{ secrets.AKS_CLUSTER }}
         admin: false
         use-kubelogin: true
 
@@ -83,19 +79,19 @@ jobs:
       run: echo "sp_check=$(az ad sp list --display-name '${{ inputs.appname }}' -o tsv | wc -l)" >> $GITHUB_ENV
 
     - name: Check ACR repository
-      run: echo "acrrepo_check=$(az acr repository list -n ${{ inputs.ACR_REGISTRY }} --query "[?contains(@, '${{ inputs.acrrepo }}')]" -o tsv | wc -l)" >> $GITHUB_ENV
+      run: echo "acrrepo_check=$(az acr repository list -n ${{ secrets.ACR_REGISTRY }} --query "[?contains(@, '${{ inputs.acrrepo }}')]" -o tsv | wc -l)" >> $GITHUB_ENV
 
     - name: Check ACR token
-      run: echo "acrtoken_check=$(az acr token show -r ${{ inputs.ACR_REGISTRY }} -n ${{ inputs.appname }} -o tsv | wc -l)" >> $GITHUB_ENV
+      run: echo "acrtoken_check=$(az acr token show -r ${{ secrets.ACR_REGISTRY }} -n ${{ inputs.appname }} -o tsv | wc -l)" >> $GITHUB_ENV
 
     - name: Check ACR scope map
-      run: echo "acrscope_check=$(az acr scope-map show -r ${{ inputs.ACR_REGISTRY }} -n ${{ inputs.appname }}-scope-map -o tsv | wc -l)" >> $GITHUB_ENV
+      run: echo "acrscope_check=$(az acr scope-map show -r ${{ secrets.ACR_REGISTRY }} -n ${{ inputs.appname }}-scope-map -o tsv | wc -l)" >> $GITHUB_ENV
 
     - name: Check AKS namespace
       run: echo "ns_check=$(kubectl get namespace ${{ inputs.appname }} --ignore-not-found --no-headers | wc -l)" >> $GITHUB_ENV
 
     - name: Check Github repository
-      run: echo "githubrepo_check=$(gh repo list ${{ inputs.GH_ORG }} --json name | grep '\"${{ inputs.appname }}\"' | wc -l)" >> $GITHUB_ENV
+      run: echo "githubrepo_check=$(gh repo list ${{ secrets.GH_ORG }} --json name | grep '\"${{ inputs.appname }}\"' | wc -l)" >> $GITHUB_ENV
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
