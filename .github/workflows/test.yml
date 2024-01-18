@@ -31,8 +31,8 @@ jobs:
     uses: ./.github/workflows/initCheck.yml
     with:    
       appenv: prod
-#      appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
-#      acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
+      appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
+      acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
 #      AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
 #      ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
 #      AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
