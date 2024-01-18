@@ -70,31 +70,23 @@ env:
 
 jobs:
 
-  env-to-output:
-    name: Get Environment vars and save as Output
+  input-to-output:
+    name: Convert input to output
     runs-on: Ubuntu-latest
     outputs:
-      APP_NAME: ${{ env.APP_NAME }}
-      ACR_REPO: ${{ env.ACR_REPO }}
+      APP_NAME: aksapp-${{ inputs.appname }}
+      ACR_REPO: aksapp/${{ inputs.appname }}
     steps:
       - run: echo ''
 
   initCheckProd:
-    needs: env-to-output
-    uses: ./.github/workflows/initCheck.yml
+    needs: input-to-output
+    uses: ./.github/workflows/createCheck-template.yml
     with:
       appenv: prod
       appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
       acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
-      AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
-      ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
-      AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
-      GH_ORG: ${{ vars.GH_ORG }}
-    secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    secrets: inherit
 
   initCheckDev:
     runs-on: ubuntu-latest
