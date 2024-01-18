@@ -30,7 +30,7 @@ jobs:
     needs: get-env-vars
     uses: ./.github/workflows/initCheck.yml
     with:    
-      appenv: prod
+      appenv: dev
       appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
       acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
 #      AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
