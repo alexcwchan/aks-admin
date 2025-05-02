@@ -2,37 +2,52 @@ name: Test reusable workflow
 
 on:
   workflow_dispatch:
-    inputs:
-      appname:
-        description: Application Name (e.g. app1, lower case alphanumeric characters or '-')
-        required: true
+#    inputs:
+#      appname:
+#        description: Application Name (e.g. app1, lower case alphanumeric characters or '-')
+#        required: true
 
-permissions:
-  id-token: write
-  contents: read
+#permissions:
+#  id-token: write
+#  contents: read
 
-env:
-  APP_NAME: aksapp-${{ inputs.appname }}
-  ACR_REPO: aksapp/${{ inputs.appname }}
+#env:
+#  APP_NAME: aksapp-${{ inputs.appname }}
+#  ACR_REPO: aksapp/${{ inputs.appname }}
 
 jobs:
 
-  get-env-vars:
-    name: Get Environment vars as output
+  test:
     runs-on: Ubuntu-latest
-    outputs:
-      APP_NAME: ${{ env.APP_NAME }}
-      ACR_REPO: ${{ env.ACR_REPO }}
-    steps:
-      - run: echo ''
 
-  initCheckProd:
-    needs: get-env-vars
-    uses: ./.github/workflows/initCheck.yml
-    with:    
-      appenv: dev
-      appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
-      acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
+  steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/checkout@v4
+      with:
+        repository: openwebui/openwebui
+        path: openwebui
+
+    - run: |
+        cd openwebui
+        echo "hash=$(git rev-parse HEAD) >> $GITHUB_ENV
+
+#  get-env-vars:
+#    name: Get Environment vars as output
+#    runs-on: Ubuntu-latest
+#    outputs:
+#      APP_NAME: ${{ env.APP_NAME }}
+#      ACR_REPO: ${{ env.ACR_REPO }}
+#    steps:
+#      - run: echo ''
+
+#  initCheckProd:
+#    needs: get-env-vars
+#    uses: ./.github/workflows/initCheck.yml
+#    with:    
+#      appenv: dev
+#      appname: ${{ needs.get-env-vars.outputs.APP_NAME }}
+#      acrrepo: ${{ needs.get-env-vars.outputs.ACR_REPO }}
 #      AKS_CLUSTER: ${{ vars.AKS_CLUSTER }}
 #      ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
 #      AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
@@ -43,8 +58,8 @@ jobs:
 #      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 #      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  deployProd:
-    runs-on: Ubuntu-latest
-    needs: initCheckProd
-    steps:
-      - run: echo ${{ needs.initCheckProd.outputs.initCheck_status }}
+#  deployProd:
+#    runs-on: Ubuntu-latest
+#    needs: initCheckProd
+#    steps:
+#      - run: echo ${{ needs.initCheckProd.outputs.initCheck_status }}
