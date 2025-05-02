@@ -28,9 +28,9 @@ jobs:
           repository: openwebui/openwebui
           path: openwebui
 
-    - run: |
-        cd openwebui
-        echo "hash=$(git rev-parse HEAD) >> $GITHUB_ENV
+      - run: |
+          cd openwebui
+          echo "hash=$(git rev-parse HEAD) >> $GITHUB_ENV
 
 #  get-env-vars:
 #    name: Get Environment vars as output
@@ -52,7 +52,7 @@ jobs:
 #      ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
 #      AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
 #      GH_ORG: ${{ vars.GH_ORG }}
-    secrets: inherit
+#    secrets: inherit
 #      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
 #      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 #      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
