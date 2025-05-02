@@ -28,6 +28,9 @@ jobs:
           cd open-webui
           echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
+      - run: |
+          printenv
+
 #  get-env-vars:
 #    name: Get Environment vars as output
 #    runs-on: Ubuntu-latest
