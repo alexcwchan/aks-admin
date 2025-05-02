@@ -23,12 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
   
-      - uses: actions/checkout@v4
-        with:
-          repository: openwebui/openwebui
-          path: openwebui
-
       - run: |
+          git clone https://github.com/open-webui/open-webui.git
           cd openwebui
           echo "hash=$(git rev-parse HEAD) >> $GITHUB_ENV
 
